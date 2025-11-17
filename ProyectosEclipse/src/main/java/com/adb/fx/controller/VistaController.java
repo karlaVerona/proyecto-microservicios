@@ -1,0 +1,210 @@
+package com.adb.fx.controller;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.*;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+
+import com.adb.fx.model.Torneo;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class VistaController {
+
+    @FXML private TextField txtBuscarNombre;
+    @FXML private ComboBox<String> cmbDeporte;
+    @FXML private DatePicker dpFecha;
+    @FXML private TableView<Torneo> tablaTorneos;
+    @FXML private TableColumn<Torneo, String> colNombre;
+    @FXML private TableColumn<Torneo, String> colReglas;
+    @FXML private TableColumn<Torneo, String> colFechaInicio;
+    @FXML private TableColumn<Torneo, String> colFechaFin;
+
+    private final ObservableList<Torneo> listaTorneos = FXCollections.observableArrayList();
+    
+    // Mapeo de nombres de deportes a IDs
+    private final Map<String, Integer> deportesMap = new HashMap<>();
+
+    @FXML
+    public void initialize() {
+        // Configurar columnas
+        colNombre.setCellValueFactory(c ->
+                new javafx.beans.property.SimpleStringProperty(c.getValue().getNombreYClasificacion()));
+        colReglas.setCellValueFactory(c ->
+                new javafx.beans.property.SimpleStringProperty(c.getValue().getReglasTorneo()));
+        colFechaInicio.setCellValueFactory(c ->
+                new javafx.beans.property.SimpleStringProperty(
+                        c.getValue().getFechaInicio() != null ? c.getValue().getFechaInicio().toString() : ""));
+        colFechaFin.setCellValueFactory(c ->
+                new javafx.beans.property.SimpleStringProperty(
+                        c.getValue().getFechaFin() != null ? c.getValue().getFechaFin().toString() : ""));
+
+        tablaTorneos.setItems(listaTorneos);
+
+        // Inicializar mapeo de deportes a IDs
+        // AJUSTA ESTOS IDs SEGÚN TU BASE DE DATOS
+        deportesMap.put("Fútbol", 1);
+        deportesMap.put("Baloncesto", 2);
+        deportesMap.put("Voleibol", 3);
+        deportesMap.put("Tenis", 4);
+        deportesMap.put("Natación", 5);
+
+        // Llenar combo de deportes
+        cmbDeporte.setItems(FXCollections.observableArrayList(
+                "Todos los deportes", "Fútbol", "Baloncesto", "Tenis", "Natación", "Voleibol"
+        ));
+
+        // Carga inicial sin filtros
+        cargarTorneos(null, null, null);
+    }
+
+    @FXML
+    private void buscarEventos() {
+        String nombre = txtBuscarNombre.getText().trim();
+        String deporteSeleccionado = cmbDeporte.getValue();
+        String fecha = (dpFecha.getValue() != null) ? dpFecha.getValue().toString() : null;
+
+        System.out.println("=== BÚSQUEDA INICIADA ===");
+        System.out.println("Nombre: " + (nombre.isEmpty() ? "null" : nombre));
+        System.out.println("Deporte: " + deporteSeleccionado);
+        System.out.println("Fecha: " + fecha);
+
+        // Convertir nombre de deporte a ID
+        Integer idDeporte = null;
+        if (deporteSeleccionado != null && !deporteSeleccionado.equals("Todos los deportes")) {
+            idDeporte = deportesMap.get(deporteSeleccionado);
+        }
+
+        // Permitir combinaciones de filtros
+        cargarTorneos(
+            nombre.isEmpty() ? null : nombre,
+            idDeporte,
+            fecha
+        );
+    }
+
+    private void cargarTorneos(String nombreYClasificacion, Integer idDeporte, String fechaInicio) {
+        try {
+            String baseUrl = "http://localhost:8080/torneos";
+            StringBuilder urlBuilder = new StringBuilder(baseUrl);
+
+            // Construir lista dinámica de parámetros (CON LOS NOMBRES CORRECTOS)
+            List<String> params = new ArrayList<>();
+            
+            if (nombreYClasificacion != null && !nombreYClasificacion.isEmpty()) {
+                params.add("nombreYClasificacion=" + URLEncoder.encode(nombreYClasificacion, StandardCharsets.UTF_8));
+            }
+            
+            if (idDeporte != null) {
+                params.add("idDeporte=" + idDeporte);
+            }
+            
+            if (fechaInicio != null && !fechaInicio.isEmpty()) {
+                params.add("fechaInicio=" + URLEncoder.encode(fechaInicio, StandardCharsets.UTF_8));
+            }
+
+            if (!params.isEmpty()) {
+                urlBuilder.append("?").append(String.join("&", params));
+            }
+
+            String finalUrl = urlBuilder.toString();
+            System.out.println("URL Final: " + finalUrl);
+
+            URL url = new URL(finalUrl);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+
+            int responseCode = con.getResponseCode();
+            System.out.println("Response Code: " + responseCode);
+            
+            if (responseCode != 200) {
+                throw new IOException("Error del servidor: " + responseCode);
+            }
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8)
+            );
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+            in.close();
+
+            System.out.println("Response JSON: " + response.toString());
+
+            JSONArray arr = new JSONArray(response.toString());
+            listaTorneos.clear();
+
+            System.out.println("Número de torneos recibidos: " + arr.length());
+
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
+                Torneo torneo = new Torneo(
+                        obj.optInt("id"),
+                        obj.optInt("idDeporte"),
+                        obj.optString("nombreYClasificacion"),
+                        obj.optString("reglasTorneo"),
+                        obj.isNull("fechaInicio") ? null : LocalDate.parse(obj.getString("fechaInicio")),
+                        obj.isNull("fechaFin") ? null : LocalDate.parse(obj.getString("fechaFin"))
+                );
+                listaTorneos.add(torneo);
+                System.out.println("Torneo agregado: " + torneo.getNombreYClasificacion());
+            }
+
+            if (listaTorneos.isEmpty()) {
+                System.out.println("⚠️ No se encontraron torneos");
+                mostrarAlerta("No se encontraron torneos con los filtros seleccionados.", Alert.AlertType.INFORMATION);
+            } else {
+                System.out.println("✅ Se cargaron " + listaTorneos.size() + " torneos");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("❌ ERROR: " + e.getMessage());
+            mostrarAlerta("No se pudieron cargar los torneos:\n" + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    /**
+     * Navega a la pantalla de login
+     */
+    @FXML
+    private void irALogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Login.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) tablaTorneos.getScene().getWindow();
+            Scene scene = new Scene(root);
+            stage.setScene(scene);
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("No se pudo cargar la pantalla de login:\n" + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    /**
+     * Muestra una alerta
+     */
+    private void mostrarAlerta(String mensaje, Alert.AlertType tipo) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(tipo == Alert.AlertType.ERROR ? "Error" : 
+                      tipo == Alert.AlertType.WARNING ? "Advertencia" : "Información");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+}

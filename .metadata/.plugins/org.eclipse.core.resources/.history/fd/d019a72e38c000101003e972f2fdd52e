@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.Image?>
+
+<BorderPane fx:controller="com.adb.fx.controller.PerfilController"
+            xmlns:fx="http://javafx.com/fxml" 
+            prefWidth="1400" 
+            prefHeight="900"
+            stylesheets="@styles.css" 
+            styleClass="root-container">
+
+    <!-- Navbar con gradiente -->
+    <top>
+        <HBox styleClass="navbar-gradient" alignment="CENTER_LEFT" spacing="40">
+            <padding>
+                <Insets top="20" right="50" bottom="20" left="50"/>
+            </padding>
+
+            <!-- Logo -->
+            <HBox spacing="15" alignment="CENTER_LEFT">
+                <ImageView fitHeight="45" fitWidth="45" preserveRatio="true">
+                    <image>
+                        <Image url="@images/icon-logo.png"/>
+                    </image>
+                </ImageView>
+                <VBox spacing="2">
+                    <Label text="Nexus Deportivo" styleClass="logo-text-gradient"/>
+                    <Label text="Tu perfil deportivo" styleClass="logo-subtitle-white"/>
+                </VBox>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Botones navegación -->
+            <HBox spacing="15" alignment="CENTER">
+                <Button text="🏆 Explorar Torneos" styleClass="nav-btn-white" onAction="#irATorneos"/>
+                <Button text="🚪 Cerrar Sesión" styleClass="nav-btn-logout" onAction="#cerrarSesion"/>
+            </HBox>
+        </HBox>
+    </top>
+
+    <!-- Contenido -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-perfil">
+            <VBox spacing="30" alignment="TOP_CENTER" styleClass="perfil-main-container">
+                
+                <!-- Header del perfil con gradiente -->
+                <VBox spacing="0" styleClass="perfil-header-gradient">
+                    
+                    <!-- Parte superior con decoración -->
+                    <StackPane prefHeight="120" styleClass="header-decoration">
+                        <VBox alignment="CENTER" spacing="5">
+                            <Label text="✨" style="-fx-font-size: 40px;"/>
+                        </VBox>
+                    </StackPane>
+                    
+                    <!-- Información del usuario -->
+                    <VBox alignment="CENTER" spacing="20" styleClass="user-info-section">
+                        <padding>
+                            <Insets top="0" right="40" bottom="40" left="40"/>
+                        </padding>
+                        
+                        <!-- Avatar con borde gradiente -->
+                        <StackPane styleClass="avatar-container">
+                            <StackPane styleClass="avatar-border">
+                                <StackPane styleClass="avatar-circle">
+                                    <Label text="👤" style="-fx-font-size: 80px;"/>
+                                </StackPane>
+                            </StackPane>
+                            <Label fx:id="lblRolBadge" text="🎯 Jugador" styleClass="role-badge-floating"/>
+                        </StackPane>
+                        
+                        <!-- Nombre y datos -->
+                        <VBox spacing="8" alignment="CENTER">
+                            <Label fx:id="lblNombreCompleto" text="Camila González" 
+                                   styleClass="profile-name-hero"/>
+                            <Label fx:id="lblCorreo" text="camila@gmail.com" 
+                                   styleClass="profile-email-hero"/>
+                        </VBox>
+                        
+                        <!-- Stats rápidas -->
+                        <HBox spacing="40" alignment="CENTER" styleClass="quick-stats-container">
+                            <VBox spacing="5" alignment="CENTER" styleClass="stat-item">
+                                <Label fx:id="lblTotalTorneos" text="3" styleClass="stat-number-hero"/>
+                                <Label text="Torneos" styleClass="stat-label-hero"/>
+                            </VBox>
+                            <Separator orientation="VERTICAL" styleClass="stat-separator"/>
+                            <VBox spacing="5" alignment="CENTER" styleClass="stat-item">
+                                <Label fx:id="lblTotalEquipos" text="2" styleClass="stat-number-hero"/>
+                                <Label text="Equipos" styleClass="stat-label-hero"/>
+                            </VBox>
+                            <Separator orientation="VERTICAL" styleClass="stat-separator"/>
+                            <VBox spacing="5" alignment="CENTER" styleClass="stat-item">
+                                <Label fx:id="lblFechaRegistro" text="Nov 2025" styleClass="stat-number-hero"/>
+                                <Label text="Miembro desde" styleClass="stat-label-hero"/>
+                            </VBox>
+                        </HBox>
+                    </VBox>
+                </VBox>
+
+                <!-- Contenedor de contenido -->
+                <VBox spacing="25" styleClass="content-wrapper">
+                    <padding>
+                        <Insets top="0" right="50" bottom="40" left="50"/>
+                    </padding>
+                    
+                    <!-- Tabs con estilo mejorado -->
+                    <ScrollPane fitToWidth="true" styleClass="tabs-scroll">
+                        <HBox spacing="10" alignment="CENTER" styleClass="tabs-container-modern">
+                            <Button fx:id="btnTabInformacion" text="📋 Información" 
+                                    styleClass="tab-btn-active" 
+                                    onAction="#mostrarInformacion"/>
+                            <Button fx:id="btnTabMisTorneos" text="🏆 Torneos" 
+                                    styleClass="tab-btn" 
+                                    onAction="#mostrarTorneos"/>
+                            <Button fx:id="btnTabMisEquipos" text="👥 Equipos" 
+                                    styleClass="tab-btn" 
+                                    onAction="#mostrarEquipos"/>
+                            <Button fx:id="btnTabHistorial" text="📊 Historial" 
+                                    styleClass="tab-btn" 
+                                    onAction="#mostrarHistorial"/>
+                            <Button fx:id="btnTabSolicitudes" text="✉️ Solicitudes" 
+                                    styleClass="tab-btn" 
+                                    onAction="#mostrarSolicitudes"/>
+                            <Button fx:id="btnTabConfiguracion" text="⚙️ Ajustes" 
+                                    styleClass="tab-btn" 
+                                    onAction="#mostrarConfiguracion"/>
+                        </HBox>
+                    </ScrollPane>
+
+                    <!-- Contenido de las secciones -->
+                    <StackPane>
+                        
+                        <!-- ========== INFORMACIÓN ========== -->
+                        <VBox fx:id="seccionInformacion" spacing="20" visible="true">
+                            
+                            <Label text="📋 Información Personal" styleClass="section-title-gradient"/>
+                            
+                            <VBox spacing="15" styleClass="info-card-gradient">
+                                <padding>
+                                    <Insets top="30" right="30" bottom="30" left="30"/>
+                                </padding>
+                                
+                                <GridPane hgap="40" vgap="20">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="25"/>
+                                        <ColumnConstraints percentWidth="25"/>
+                                        <ColumnConstraints percentWidth="25"/>
+                                        <ColumnConstraints percentWidth="25"/>
+                                    </columnConstraints>
+                                    
+                                    <!-- Row 1 -->
+                                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <HBox spacing="8" alignment="CENTER_LEFT">
+                                            <Label text="👤" styleClass="info-icon"/>
+                                            <Label text="Nombre" styleClass="info-label-gradient"/>
+                                        </HBox>
+                                        <Label fx:id="lblInfoNombre" text="Camila" styleClass="info-value-gradient"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <HBox spacing="8" alignment="CENTER_LEFT">
+                                            <Label text="👤" styleClass="info-icon"/>
+                                            <Label text="Apellido" styleClass="info-label-gradient"/>
+                                        </HBox>
+                                        <Label fx:id="lblInfoApellido" text="González" styleClass="info-value-gradient"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="8" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                        <HBox spacing="8" alignment="CENTER_LEFT">
+                                            <Label text="📧" styleClass="info-icon"/>
+                                            <Label text="Email" styleClass="info-label-gradient"/>
+                                        </HBox>
+                                        <Label fx:id="lblInfoCorreo" text="camila@gmail.com" styleClass="info-value-gradient"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="8" GridPane.columnIndex="3" GridPane.rowIndex="0">
+                                        <HBox spacing="8" alignment="CENTER_LEFT">
+                                            <Label text="🎯" styleClass="info-icon"/>
+                                            <Label text="Rol" styleClass="info-label-gradient"/>
+                                        </HBox>
+                                        <Label fx:id="lblInfoRol" text="Jugador" styleClass="info-value-gradient"/>
+                                    </VBox>
+                                    
+                                    <!-- Row 2 -->
+                                    <VBox spacing="8" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <HBox spacing="8" alignment="CENTER_LEFT">
+                                            <Label text="⚽" styleClass="info-icon"/>
+                                            <Label text="Deporte" styleClass="info-label-gradient"/>
+                                        </HBox>
+                                        <Label fx:id="lblInfoDeporte" text="Fútbol" styleClass="info-value-gradient"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="8" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <HBox spacing="8" alignment="CENTER_LEFT">
+                                            <Label text="📅" styleClass="info-icon"/>
+                                            <Label text="Registro" styleClass="info-label-gradient"/>
+                                        </HBox>
+                                        <Label fx:id="lblInfoFechaRegistro" text="2025-11-11" styleClass="info-value-gradient"/>
+                                    </VBox>
+                                </GridPane>
+                            </VBox>
+                            
+                        </VBox>
+
+                        <!-- ========== MIS TORNEOS ========== -->
+                        <VBox fx:id="seccionMisTorneos" spacing="20" visible="false">
+                            
+                            <Label text="🏆 Gestión de Torneos" styleClass="section-title-gradient"/>
+                            
+                            <!-- Inscribirse -->
+                            <VBox spacing="15" styleClass="action-card-gradient">
+                                <padding>
+                                    <Insets top="25" right="25" bottom="25" left="25"/>
+                                </padding>
+                                
+                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                    <StackPane styleClass="action-icon-circle">
+                                        <Label text="🎯" style="-fx-font-size: 30px;"/>
+                                    </StackPane>
+                                    <VBox spacing="5">
+                                        <Label text="Inscríbete a un Torneo" styleClass="card-title-gradient"/>
+                                        <Label text="Únete a la competencia y demuestra tu talento" 
+                                               styleClass="card-subtitle-gradient"/>
+                                    </VBox>
+                                </HBox>
+                                
+                                <HBox spacing="12" alignment="CENTER_LEFT">
+                                    <ComboBox fx:id="cmbTorneosDisponibles" 
+                                             promptText="🔍 Buscar torneo..."
+                                             styleClass="combo-gradient" 
+                                             prefWidth="550"/>
+                                    <Button text="📝 Inscribirme" styleClass="btn-gradient-primary" 
+                                           onAction="#inscribirseATorneo" prefWidth="160"/>
+                                </HBox>
+                            </VBox>
+                            
+                            <!-- Mis inscripciones -->
+                            <VBox spacing="12">
+                                <HBox alignment="CENTER_LEFT" spacing="12">
+                                    <Label text="📋 Mis Inscripciones" styleClass="subsection-title-gradient"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="lblContadorInscripciones" text="3 activas" 
+                                           styleClass="badge-gradient"/>
+                                </HBox>
+                                
+                                <TableView fx:id="tablaMisInscripciones" styleClass="table-gradient" prefHeight="320">
+                                    <columns>
+                                        <TableColumn fx:id="colTorneoNombre" text="🏆 Torneo" prefWidth="320"/>
+                                        <TableColumn fx:id="colTorneoDeporte" text="⚽ Deporte" prefWidth="140"/>
+                                        <TableColumn fx:id="colTorneoFecha" text="📅 Inicio" prefWidth="130"/>
+                                        <TableColumn fx:id="colTorneoEstado" text="📊 Estado" prefWidth="120"/>
+                                        <TableColumn fx:id="colTorneoAcciones" text="⚙️ Acciones" prefWidth="150"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                            
+                        </VBox>
+
+                        <!-- ========== MIS EQUIPOS ========== -->
+                        <VBox fx:id="seccionMisEquipos" spacing="20" visible="false">
+                            
+                            <Label text="👥 Mis Equipos" styleClass="section-title-gradient"/>
+                            
+                            <!-- Crear equipo -->
+                            <VBox fx:id="cardCrearEquipo" spacing="15" styleClass="action-card-success">
+                                <padding>
+                                    <Insets top="25" right="25" bottom="25" left="25"/>
+                                </padding>
+                                
+                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                    <StackPane styleClass="action-icon-success">
+                                        <Label text="➕" style="-fx-font-size: 30px; -fx-text-fill: white;"/>
+                                    </StackPane>
+                                    <VBox spacing="5">
+                                        <Label text="Crear Nuevo Equipo" styleClass="card-title-gradient"/>
+                                        <Label text="Forma tu equipo y compite juntos" 
+                                               styleClass="card-subtitle-gradient"/>
+                                    </VBox>
+                                </HBox>
+                                
+                                <GridPane hgap="15" vgap="12">
+                                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label text="Nombre del Equipo *" styleClass="form-label-gradient"/>
+                                        <TextField fx:id="txtNombreEquipo" 
+                                                  promptText="Ej: Águilas FC"
+                                                  styleClass="input-gradient" 
+                                                  prefWidth="350"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label text="Deporte *" styleClass="form-label-gradient"/>
+                                        <ComboBox fx:id="cmbDeporteEquipo" 
+                                                 promptText="Selecciona..."
+                                                 styleClass="combo-gradient" 
+                                                 prefWidth="300"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1" 
+                                          GridPane.columnSpan="2">
+                                        <Label text="Descripción" styleClass="form-label-gradient"/>
+                                        <TextArea fx:id="txtDescripcionEquipo" 
+                                                 promptText="Describe tu equipo..."
+                                                 styleClass="textarea-gradient" 
+                                                 prefHeight="70"
+                                                 wrapText="true"/>
+                                    </VBox>
+                                </GridPane>
+                                
+                                <HBox spacing="10">
+                                    <Button text="✅ Crear Equipo" styleClass="btn-gradient-success" 
+                                           onAction="#crearEquipo" prefWidth="150"/>
+                                    <Label text="💡 Solo capitanes pueden crear equipos" 
+                                           styleClass="help-text-gradient"/>
+                                </HBox>
+                            </VBox>
+                            
+                            <!-- Lista equipos -->
+                            <VBox spacing="12">
+                                <HBox alignment="CENTER_LEFT" spacing="12">
+                                    <Label text="📋 Mis Equipos" styleClass="subsection-title-gradient"/>
+                                    <Region HBox.hgrow="ALWAYS"/>
+                                    <Label fx:id="lblContadorEquipos" text="2 equipos" styleClass="badge-gradient"/>
+                                </HBox>
+                                
+                                <TableView fx:id="tablaMisEquipos" styleClass="table-gradient" prefHeight="280">
+                                    <columns>
+                                        <TableColumn fx:id="colEquipoNombre" text="👥 Equipo" prefWidth="250"/>
+                                        <TableColumn fx:id="colEquipoDeporte" text="⚽ Deporte" prefWidth="120"/>
+                                        <TableColumn fx:id="colEquipoRol" text="🎯 Mi Rol" prefWidth="130"/>
+                                        <TableColumn fx:id="colEquipoMiembros" text="👤 Miembros" prefWidth="90"/>
+                                        <TableColumn fx:id="colEquipoEstado" text="📊 Estado" prefWidth="110"/>
+                                        <TableColumn fx:id="colEquipoAcciones" text="⚙️ Acciones" prefWidth="140"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                            
+                        </VBox>
+
+                        <!-- ========== HISTORIAL ========== -->
+                        <VBox fx:id="seccionHistorial" spacing="20" visible="false">
+                            
+                            <Label text="📊 Mi Historial Deportivo" styleClass="section-title-gradient"/>
+                            
+                            <!-- Stats -->
+                            <HBox spacing="20" alignment="CENTER">
+                                
+                                <VBox spacing="10" alignment="CENTER" styleClass="stat-card-gradient">
+                                    <Label text="🏆" style="-fx-font-size: 36px;"/>
+                                    <Label fx:id="lblHistorialTorneos" text="12" styleClass="stat-big-number"/>
+                                    <Label text="Torneos Jugados" styleClass="stat-big-label"/>
+                                </VBox>
+                                
+                                <VBox spacing="10" alignment="CENTER" styleClass="stat-card-gradient">
+                                    <Label text="⚽" style="-fx-font-size: 36px;"/>
+                                    <Label fx:id="lblHistorialPartidos" text="45" styleClass="stat-big-number"/>
+                                    <Label text="Partidos" styleClass="stat-big-label"/>
+                                </VBox>
+                                
+                                <VBox spacing="10" alignment="CENTER" styleClass="stat-card-gradient">
+                                    <Label text="🥇" style="-fx-font-size: 36px;"/>
+                                    <Label fx:id="lblHistorialVictorias" text="28" styleClass="stat-big-number"/>
+                                    <Label text="Victorias" styleClass="stat-big-label"/>
+                                </VBox>
+                                
+                                <VBox spacing="10" alignment="CENTER" styleClass="stat-card-gradient">
+                                    <Label text="📈" style="-fx-font-size: 36px;"/>
+                                    <Label fx:id="lblHistorialWinRate" text="62%" styleClass="stat-big-number"/>
+                                    <Label text="Win Rate" styleClass="stat-big-label"/>
+                                </VBox>
+                                
+                            </HBox>
+                            
+                            <!-- Historial tabla -->
+                            <VBox spacing="12">
+                                <Label text="📜 Partidos Recientes" styleClass="subsection-title-gradient"/>
+                                
+                                <TableView fx:id="tablaHistorialPartidos" styleClass="table-gradient" prefHeight="320">
+                                    <columns>
+                                        <TableColumn fx:id="colHistorialFecha" text="📅 Fecha" prefWidth="110"/>
+                                        <TableColumn fx:id="colHistorialTorneo" text="🏆 Torneo" prefWidth="230"/>
+                                        <TableColumn fx:id="colHistorialEquipo" text="👥 Mi Equipo" prefWidth="180"/>
+                                        <TableColumn fx:id="colHistorialRival" text="⚔️ Rival" prefWidth="180"/>
+                                        <TableColumn fx:id="colHistorialResultado" text="📊 Resultado" prefWidth="110"/>
+                                        <TableColumn fx:id="colHistorialEstado" text="🎯 Estado" prefWidth="100"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                            
+                        </VBox>
+
+                        <!-- ========== SOLICITUDES ========== -->
+                        <VBox fx:id="seccionSolicitudes" spacing="20" visible="false">
+                            
+                            <Label text="✉️ Solicitudes de Roles" styleClass="section-title-gradient"/>
+                            
+                            <!-- Capitán -->
+                            <VBox spacing="15" styleClass="request-card-captain">
+                                <padding>
+                                    <Insets top="25" right="25" bottom="25" left="25"/>
+                                </padding>
+                                
+                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                    <StackPane styleClass="request-icon-captain">
+                                        <Label text="👨‍✈️" style="-fx-font-size: 38px;"/>
+                                    </StackPane>
+                                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                        <Label text="Solicitar Rol de Capitán" styleClass="request-title-gradient"/>
+                                        <Label text="Lidera tu equipo y toma las decisiones estratégicas" 
+                                               styleClass="request-desc-gradient" wrapText="true"/>
+                                    </VBox>
+                                </HBox>
+                                
+                                <VBox spacing="8">
+                                    <Label text="¿Por qué deberías ser capitán? *" styleClass="form-label-gradient"/>
+                                    <TextArea fx:id="txtRazonCapitan" 
+                                             promptText="Explica tu experiencia y habilidades de liderazgo..."
+                                             styleClass="textarea-gradient" 
+                                             prefHeight="90"
+                                             wrapText="true"/>
+                                </VBox>
+                                
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <Button text="📤 Enviar Solicitud" styleClass="btn-gradient-captain" 
+                                           onAction="#solicitarCapitan" prefWidth="170"/>
+                                    <Label fx:id="lblEstadoSolicitudCapitan" text="⏳ Pendiente" 
+                                           styleClass="status-badge-pending" visible="false"/>
+                                </HBox>
+                            </VBox>
+                            
+                            <!-- Árbitro -->
+                            <VBox spacing="15" styleClass="request-card-referee">
+                                <padding>
+                                    <Insets top="25" right="25" bottom="25" left="25"/>
+                                </padding>
+                                
+                                <HBox spacing="15" alignment="CENTER_LEFT">
+                                    <StackPane styleClass="request-icon-referee">
+                                        <Label text="⚖️" style="-fx-font-size: 38px;"/>
+                                    </StackPane>
+                                    <VBox spacing="5" HBox.hgrow="ALWAYS">
+                                        <Label text="Solicitar Rol de Árbitro" styleClass="request-title-gradient"/>
+                                        <Label text="Garantiza el juego limpio y la justicia deportiva" 
+                                               styleClass="request-desc-gradient" wrapText="true"/>
+                                    </VBox>
+                                </HBox>
+                                
+                                <VBox spacing="8">
+                                    <Label text="Describe tu experiencia *" styleClass="form-label-gradient"/>
+                                    <TextArea fx:id="txtRazonArbitro" 
+                                             promptText="Experiencia previa, conocimiento de reglas..."
+                                             styleClass="textarea-gradient" 
+                                             prefHeight="90"
+                                             wrapText="true"/>
+                                </VBox>
+                                
+                                <HBox spacing="10" alignment="CENTER_LEFT">
+                                    <Button text="📤 Enviar Solicitud" styleClass="btn-gradient-referee" 
+                                           onAction="#solicitarArbitro" prefWidth="170"/>
+                                    <Label fx:id="lblEstadoSolicitudArbitro" text="⏳ Pendiente" 
+                                           styleClass="status-badge-pending" visible="false"/>
+                                </HBox>
+                            </VBox>
+                            
+                            <!-- Estado solicitudes -->
+                            <VBox spacing="12">
+                                <Label text="📊 Estado de Solicitudes" styleClass="subsection-title-gradient"/>
+                                
+                                <TableView fx:id="tablaSolicitudes" styleClass="table-gradient" prefHeight="230">
+                                    <columns>
+                                        <TableColumn fx:id="colSolicitudTipo" text="📋 Tipo" prefWidth="180"/>
+                                        <TableColumn fx:id="colSolicitudFecha" text="📅 Fecha" prefWidth="130"/>
+                                        <TableColumn fx:id="colSolicitudEstado" text="📊 Estado" prefWidth="130"/>
+                                        <TableColumn fx:id="colSolicitudRespuesta" text="💬 Respuesta" prefWidth="340"/>
+                                        <TableColumn fx:id="colSolicitudAcciones" text="⚙️ Acciones" prefWidth="120"/>
+                                    </columns>
+                                </TableView>
+                            </VBox>
+                            
+                        </VBox>
+
+                        <!-- ========== CONFIGURACIÓN ========== -->
+                        <VBox fx:id="seccionConfiguracion" spacing="25" visible="false">
+                            
+                            <Label text="⚙️ Configuración de Cuenta" styleClass="section-title-gradient"/>
+                            
+                            <!-- Editar -->
+                            <VBox spacing="15" styleClass="config-card-gradient">
+                                <padding>
+                                    <Insets top="25" right="25" bottom="25" left="25"/>
+                                </padding>
+                                
+                                <Label text="✏️ Editar Información" styleClass="card-title-gradient"/>
+                                
+                                <GridPane hgap="15" vgap="12">
+                                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label text="Nombre *" styleClass="form-label-gradient"/>
+                                        <TextField fx:id="txtEditarNombre" styleClass="input-gradient" prefWidth="330"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label text="Apellido *" styleClass="form-label-gradient"/>
+                                        <TextField fx:id="txtEditarApellido" styleClass="input-gradient" prefWidth="330"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label text="Email *" styleClass="form-label-gradient"/>
+                                        <TextField fx:id="txtEditarCorreo" styleClass="input-gradient" prefWidth="330"/>
+                                    </VBox>
+                                    
+                                    <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label text="Deporte Favorito" styleClass="form-label-gradient"/>
+                                        <ComboBox fx:id="cmbEditarDeporte" 
+                                                 styleClass="combo-gradient" 
+                                                 prefWidth="330"/>
+                                    </VBox>
+                                </GridPane>
+                                
+                                <HBox spacing="12">
+                                    <Button text="💾 Guardar Cambios" styleClass="btn-gradient-primary" 
+                                           onAction="#guardarCambios" prefWidth="170"/>
+                                    <Button text="❌ Cancelar" styleClass="btn-gradient-secondary" 
+                                           onAction="#cancelarEdicion" prefWidth="130"/>
+                                </HBox>
+                            </VBox>
+                            
+                            <!-- Zona peligro -->
+                            <VBox spacing="15" styleClass="danger-card-gradient">
+                                <padding>
+                                    <Insets top="25" right="25" bottom="25" left="25"/>
+                                </padding>
+                                
+                                <HBox spacing="12" alignment="CENTER_LEFT">
+                                    <StackPane styleClass="danger-icon-circle">
+                                        <Label text="⚠️" style="-fx-font-size: 32px;"/>
+                                    </StackPane>
+                                    <VBox spacing="5">
+                                        <Label text="⚠️ Zona de Peligro" styleClass="danger-title-gradient"/>
+                                        <Label text="Las acciones aquí son permanentes e irreversibles" 
+                                               styleClass="danger-subtitle-gradient"/>
+                                    </VBox>
+                                </HBox>
+                                
+                                <VBox spacing="8">
+                                    <Label text="Eliminar Cuenta Permanentemente" styleClass="danger-action-title"/>
+                                    <Label text="Se borrarán todos tus datos, inscripciones, equipos y estadísticas. Esta acción no se puede deshacer." 
+                                           styleClass="danger-text-gradient" wrapText="true"/>
+                                </VBox>
+                                
+                                <Button text="🗑️ Eliminar Mi Cuenta" styleClass="btn-gradient-danger" 
+                                       onAction="#eliminarCuenta" prefWidth="210"/>
+                            </VBox>
+                            
+                        </VBox>
+
+                    </StackPane>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

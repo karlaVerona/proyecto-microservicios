@@ -1,0 +1,103 @@
+package com.adb.fx.controller;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.*;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+
+import com.adb.fx.model.Torneo;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class VistaController {
+
+    @FXML private TextField txtBuscarNombre;
+    @FXML private ComboBox<String> cmbDeporte;
+    @FXML private DatePicker dpFecha;
+    @FXML private TableView<Torneo> tablaTorneos;
+    @FXML private TableColumn<Torneo, String> colNombre;
+    @FXML private TableColumn<Torneo, String> colReglas;
+    @FXML private TableColumn<Torneo, String> colFechaInicio;
+    @FXML private TableColumn<Torneo, String> colFechaFin;
+
+    private ObservableList<Torneo> listaTorneos = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        colNombre.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getNombreYClasificacion()));
+        colReglas.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getReglasTorneo()));
+        colFechaInicio.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
+                c.getValue().getFechaInicio() != null ? c.getValue().getFechaInicio().toString() : ""));
+        colFechaFin.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(
+                c.getValue().getFechaFin() != null ? c.getValue().getFechaFin().toString() : ""));
+
+        tablaTorneos.setItems(listaTorneos);
+
+        cmbDeporte.setItems(FXCollections.observableArrayList("Fútbol", "Baloncesto", "Tenis", "Natación", "Voleibol"));
+
+        cargarTorneos(null, null, null);
+    }
+
+    @FXML
+    private void buscarEventos() {
+        String nombre = txtBuscarNombre.getText().trim();
+        String deporte = cmbDeporte.getValue();
+        String fecha = dpFecha.getValue() != null ? dpFecha.getValue().toString() : null;
+
+        cargarTorneos(nombre, deporte, fecha);
+    }
+
+    private void cargarTorneos(String nombre, String deporte, String fecha) {
+        try {
+            // ✅ Ajusta esta URL al endpoint real de tu microservicio Torneo
+            String urlStr = "http://localhost:8080/torneos"; 
+
+            List<String> params = new ArrayList<>();
+            if (nombre != null && !nombre.isEmpty()) params.add("nombreYClasificacion=" + nombre);
+            if (deporte != null && !deporte.isEmpty()) params.add("idDeporte=" + deporte);
+            if (fecha != null && !fecha.isEmpty()) params.add("fechaInicio=" + fecha);
+
+            if (!params.isEmpty()) urlStr += "?" + String.join("&", params);
+
+            URL url = new URL(urlStr);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) response.append(line);
+            in.close();
+
+            JSONArray arr = new JSONArray(response.toString());
+            listaTorneos.clear();
+
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
+
+                Torneo t = new Torneo(
+                        obj.optInt("id"),
+                        obj.optInt("idDeporte"),
+                        obj.optString("nombreYClasificacion"),
+                        obj.optString("reglasTorneo"),
+                        obj.isNull("fechaInicio") ? null : LocalDate.parse(obj.getString("fechaInicio")),
+                        obj.isNull("fechaFin") ? null : LocalDate.parse(obj.getString("fechaFin"))
+                );
+
+                listaTorneos.add(t);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Error al cargar los torneos: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+}

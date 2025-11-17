@@ -1,0 +1,142 @@
+package com.adb.fx.controller;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.util.*;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+
+import com.adb.fx.model.Torneo;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class VistaController {
+
+    @FXML private TextField txtBuscarNombre;
+    @FXML private ComboBox<String> cmbDeporte;
+    @FXML private DatePicker dpFecha;
+    @FXML private TableView<Torneo> tablaTorneos;
+    @FXML private TableColumn<Torneo, String> colNombre;
+    @FXML private TableColumn<Torneo, String> colReglas;
+    @FXML private TableColumn<Torneo, String> colFechaInicio;
+    @FXML private TableColumn<Torneo, String> colFechaFin;
+
+    private final ObservableList<Torneo> listaTorneos = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        // Configurar columnas
+        colNombre.setCellValueFactory(c ->
+                new javafx.beans.property.SimpleStringProperty(c.getValue().getNombreYClasificacion()));
+        colReglas.setCellValueFactory(c ->
+                new javafx.beans.property.SimpleStringProperty(c.getValue().getReglasTorneo()));
+        colFechaInicio.setCellValueFactory(c ->
+                new javafx.beans.property.SimpleStringProperty(
+                        c.getValue().getFechaInicio() != null ? c.getValue().getFechaInicio().toString() : ""));
+        colFechaFin.setCellValueFactory(c ->
+                new javafx.beans.property.SimpleStringProperty(
+                        c.getValue().getFechaFin() != null ? c.getValue().getFechaFin().toString() : ""));
+
+        tablaTorneos.setItems(listaTorneos);
+
+        // Llenar combo de deportes (ajústalo a tus datos reales)
+        cmbDeporte.setItems(FXCollections.observableArrayList(
+                "Fútbol", "Baloncesto", "Tenis", "Natación", "Voleibol"
+        ));
+
+        // Carga inicial sin filtros
+        cargarTorneos(null, null, null);
+    }
+
+    @FXML
+    private void buscarEventos() {
+        String nombre = txtBuscarNombre.getText().trim();
+        String deporte = cmbDeporte.getValue();
+        String fecha = (dpFecha.getValue() != null) ? dpFecha.getValue().toString() : null;
+
+        // Permitir combinaciones de filtros
+        cargarTorneos(nombre.isEmpty() ? null : nombre,
+                      (deporte != null && !deporte.isEmpty()) ? deporte : null,
+                      fecha);
+    }
+
+    private void cargarTorneos(String nombre, String deporte, String fecha) {
+        try {
+            String baseUrl = "http://localhost:8080/torneos";
+            StringBuilder urlBuilder = new StringBuilder(baseUrl);
+
+            // Construir lista dinámica de parámetros
+            List<String> params = new ArrayList<>();
+            if (nombre != null) {
+                params.add("nombre=" + URLEncoder.encode(nombre, StandardCharsets.UTF_8));
+            }
+            if (deporte != null) {
+                params.add("deporte=" + URLEncoder.encode(deporte, StandardCharsets.UTF_8));
+            }
+            if (fecha != null) {
+                params.add("fecha=" + URLEncoder.encode(fecha, StandardCharsets.UTF_8));
+            }
+
+            if (!params.isEmpty()) {
+                urlBuilder.append("?").append(String.join("&", params));
+            }
+
+            URL url = new URL(urlBuilder.toString());
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+
+            int responseCode = con.getResponseCode();
+            if (responseCode != 200) {
+                throw new IOException("Error del servidor: " + responseCode);
+            }
+
+            BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8)
+            );
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) {
+                response.append(line);
+            }
+            in.close();
+
+            JSONArray arr = new JSONArray(response.toString());
+            listaTorneos.clear();
+
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
+                Torneo torneo = new Torneo(
+                        obj.optInt("id"),
+                        obj.optInt("idDeporte"),
+                        obj.optString("nombreYClasificacion"),
+                        obj.optString("reglasTorneo"),
+                        obj.isNull("fechaInicio") ? null : LocalDate.parse(obj.getString("fechaInicio")),
+                        obj.isNull("fechaFin") ? null : LocalDate.parse(obj.getString("fechaFin"))
+                );
+                listaTorneos.add(torneo);
+            }
+
+            if (listaTorneos.isEmpty()) {
+                mostrarAlerta("Sin resultados", "No se encontraron torneos con los filtros seleccionados.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error", "No se pudieron cargar los torneos:\n" + e.getMessage());
+        }
+    }
+
+    private void mostrarAlerta(String titulo, String mensaje) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+}

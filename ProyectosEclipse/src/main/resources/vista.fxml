@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.Image?>
+
+<BorderPane fx:controller="com.adb.fx.controller.VistaController"
+            xmlns:fx="http://javafx.com/fxml" 
+            prefWidth="1200" 
+            prefHeight="800"
+            stylesheets="@styles.css" 
+            styleClass="root-container">
+
+    <!-- Barra superior -->
+    <top>
+        <VBox spacing="0">
+            <!-- Navbar -->
+            <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="30">
+                <padding>
+                    <Insets top="15" right="40" bottom="15" left="40"/>
+                </padding>
+
+                <!-- Logo -->
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <ImageView fitHeight="40" fitWidth="40" preserveRatio="true">
+                        <image>
+                            <Image url="@images/icon-logo.png"/>
+                        </image>
+                    </ImageView>
+                    <Label text="Nexus Deportivo" styleClass="logo-text"/>
+                </HBox>
+
+                <Region prefWidth="30"/>
+
+                <!-- Botones de navegación -->
+                <HBox spacing="8" alignment="CENTER_LEFT">
+                    <Button text="Eventos" styleClass="nav-button"/>
+                    <Button text="Resultados" styleClass="nav-button"/>
+                    <Button text="Torneos" styleClass="nav-button-active"/>
+                    <Button text="Equipos" styleClass="nav-button"/>
+                </HBox>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Botón iniciar sesión -->
+                <!-- Botón iniciar sesión -->
+<Button text="Iniciar sesión" styleClass="login-button" onAction="#irALogin">
+    <graphic>
+        <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+            <image>
+                <Image url="@images/icon-user.png"/>
+            </image>
+        </ImageView>
+    </graphic>
+</Button>
+            </HBox>
+
+            <!-- Banner Hero -->
+            <StackPane styleClass="hero-banner" prefHeight="280">
+                <!-- Imagen de fondo -->
+                <ImageView fitWidth="1200" fitHeight="280" preserveRatio="false">
+                    <image>
+                        <Image url="@images/banner.jpg"/>
+                    </image>
+                </ImageView>
+                
+                <!-- Overlay oscuro -->
+                <Region styleClass="hero-overlay"/>
+                
+                <!-- Contenido del hero -->
+                <VBox alignment="CENTER" spacing="25">
+                    <Label text="Encuentra tu próximo evento" styleClass="hero-title"/>
+                    <Label text="Descubre y participa en torneos deportivos" styleClass="hero-subtitle"/>
+                </VBox>
+            </StackPane>
+
+            <!-- Barra de búsqueda flotante -->
+            <StackPane styleClass="search-container">
+                <HBox styleClass="search-bar-floating" alignment="CENTER" spacing="0" maxWidth="950">
+                    <padding>
+                        <Insets top="5" right="5" bottom="5" left="5"/>
+                    </padding>
+                    
+                    <TextField fx:id="txtBuscarNombre" 
+                               promptText="Buscar nombre de evento..." 
+                               styleClass="search-input"
+                               prefWidth="300"/>
+                    
+                    <Separator orientation="VERTICAL" styleClass="search-separator"/>
+                    
+                    <ComboBox fx:id="cmbDeporte" 
+                              promptText="Tipo de deporte" 
+                              styleClass="search-combo"
+                              prefWidth="220"/>
+                    
+                    <Separator orientation="VERTICAL" styleClass="search-separator"/>
+                    
+                    <DatePicker fx:id="dpFecha" 
+                                promptText="Fecha del evento" 
+                                styleClass="search-datepicker"
+                                prefWidth="220"/>
+                    
+                    <Button text="Buscar" 
+                            onAction="#buscarEventos" 
+                            styleClass="btn-buscar-hero"/>
+                </HBox>
+            </StackPane>
+        </VBox>
+    </top>
+
+    <!-- Centro: Contenido principal -->
+    <center>
+        <ScrollPane fitToWidth="true" styleClass="scroll-pane-main">
+            <VBox spacing="25" styleClass="content-main">
+                <padding>
+                    <Insets top="30" right="50" bottom="30" left="50"/>
+                </padding>
+
+                <!-- Encabezado de sección -->
+                <HBox spacing="20" alignment="CENTER_LEFT">
+                    <Label text="Próximos eventos" styleClass="section-title"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                </HBox>
+
+                <!-- Tabla de torneos -->
+                <VBox styleClass="table-container">
+                    <TableView fx:id="tablaTorneos" styleClass="table-torneos">
+                        <columns>
+                            <TableColumn fx:id="colNombre" 
+                                       text="Nombre / Clasificación" 
+                                       prefWidth="300"
+                                       styleClass="table-column"/>
+                            <TableColumn fx:id="colReglas" 
+                                       text="Reglas" 
+                                       prefWidth="350"
+                                       styleClass="table-column"/>
+                            <TableColumn fx:id="colFechaInicio" 
+                                       text="Fecha inicio" 
+                                       prefWidth="150"
+                                       styleClass="table-column"/>
+                            <TableColumn fx:id="colFechaFin" 
+                                       text="Fecha fin" 
+                                       prefWidth="150"
+                                       styleClass="table-column"/>
+                        </columns>
+                        
+                        <!-- Placeholder cuando no hay datos -->
+                        <placeholder>
+                            <VBox alignment="CENTER" spacing="15">
+                                <padding>
+                                    <Insets top="40" bottom="40"/>
+                                </padding>
+                                <Label text="📋" styleClass="placeholder-icon"/>
+                                <Label text="No se encontraron torneos" styleClass="placeholder-text"/>
+                                <Label text="Intenta ajustar los filtros de búsqueda" styleClass="placeholder-subtext"/>
+                            </VBox>
+                        </placeholder>
+                    </TableView>
+                </VBox>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

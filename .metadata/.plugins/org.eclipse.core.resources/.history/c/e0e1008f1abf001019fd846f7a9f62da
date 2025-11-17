@@ -1,0 +1,329 @@
+package com.adb.fx.controller;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import org.json.JSONObject;
+
+public class LoginController {
+
+    // Tabs
+    @FXML private Button btnTabLogin;
+    @FXML private Button btnTabRegistro;
+    
+    // Formularios
+    @FXML private VBox loginForm;
+    @FXML private VBox registroForm;
+    
+    // Campos de Login
+    @FXML private TextField txtLoginUsuario;
+    @FXML private PasswordField txtLoginPassword;
+    @FXML private CheckBox chkRecordarme;
+    
+    // Campos de Registro
+    @FXML private TextField txtRegistroNombre;
+    @FXML private TextField txtRegistroEmail;
+    @FXML private TextField txtRegistroUsuario;
+    @FXML private PasswordField txtRegistroPassword;
+    @FXML private PasswordField txtRegistroConfirmPassword;
+    @FXML private CheckBox chkTerminos;
+
+    @FXML
+    public void initialize() {
+        // Iniciar mostrando el formulario de login
+        mostrarLogin();
+    }
+
+    /**
+     * Muestra el formulario de login
+     */
+    @FXML
+    private void mostrarLogin() {
+        loginForm.setVisible(true);
+        registroForm.setVisible(false);
+        
+        // Cambiar estilos de tabs
+        btnTabLogin.getStyleClass().clear();
+        btnTabLogin.getStyleClass().add("login-tab-button-active");
+        
+        btnTabRegistro.getStyleClass().clear();
+        btnTabRegistro.getStyleClass().add("login-tab-button");
+    }
+
+    /**
+     * Muestra el formulario de registro
+     */
+    @FXML
+    private void mostrarRegistro() {
+        loginForm.setVisible(false);
+        registroForm.setVisible(true);
+        
+        // Cambiar estilos de tabs
+        btnTabRegistro.getStyleClass().clear();
+        btnTabRegistro.getStyleClass().add("login-tab-button-active");
+        
+        btnTabLogin.getStyleClass().clear();
+        btnTabLogin.getStyleClass().add("login-tab-button");
+    }
+
+    /**
+     * Procesa el inicio de sesión
+     */
+    @FXML
+    private void iniciarSesion() {
+        String usuario = txtLoginUsuario.getText().trim();
+        String password = txtLoginPassword.getText();
+
+        // Validaciones básicas
+        if (usuario.isEmpty() || password.isEmpty()) {
+            mostrarAlerta("Campos vacíos", "Por favor completa todos los campos", Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            // AQUÍ DEBES INTEGRAR CON TU MICROSERVICIO DE USUARIOS
+            // URL de tu microservicio
+            String urlString = "http://localhost:8083/api/usuarios/login";
+            
+            URL url = new URL(urlString);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setDoOutput(true);
+
+            // Crear JSON con credenciales
+            JSONObject json = new JSONObject();
+            json.put("usuario", usuario);
+            json.put("password", password);
+
+            // Enviar datos
+            try (OutputStream os = con.getOutputStream()) {
+                byte[] input = json.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = con.getResponseCode();
+            
+            if (responseCode == 200) {
+                // Login exitoso
+                BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8)
+                );
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                in.close();
+
+                // Parsear respuesta
+                JSONObject responseJson = new JSONObject(response.toString());
+                
+                mostrarAlerta("¡Bienvenido!", "Inicio de sesión exitoso", Alert.AlertType.INFORMATION);
+                
+                // AQUÍ DEBES NAVEGAR A LA VISTA PRINCIPAL
+                // Ejemplo: cargarVistaPrincipal();
+                
+            } else {
+                mostrarAlerta("Error", "Usuario o contraseña incorrectos", Alert.AlertType.ERROR);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error de conexión", 
+                         "No se pudo conectar con el servidor:\n" + e.getMessage(), 
+                         Alert.AlertType.ERROR);
+        }
+    }
+
+    /**
+     * Procesa la creación de cuenta
+     */
+    @FXML
+    private void crearCuenta() {
+        String nombre = txtRegistroNombre.getText().trim();
+        String email = txtRegistroEmail.getText().trim();
+        String usuario = txtRegistroUsuario.getText().trim();
+        String password = txtRegistroPassword.getText();
+        String confirmPassword = txtRegistroConfirmPassword.getText();
+
+        // Validaciones
+        if (nombre.isEmpty() || email.isEmpty() || usuario.isEmpty() || 
+            password.isEmpty() || confirmPassword.isEmpty()) {
+            mostrarAlerta("Campos vacíos", "Por favor completa todos los campos", Alert.AlertType.WARNING);
+            return;
+        }
+
+        if (!password.equals(confirmPassword)) {
+            mostrarAlerta("Error", "Las contraseñas no coinciden", Alert.AlertType.ERROR);
+            return;
+        }
+
+        if (password.length() < 8) {
+            mostrarAlerta("Contraseña débil", 
+                         "La contraseña debe tener al menos 8 caracteres", 
+                         Alert.AlertType.WARNING);
+            return;
+        }
+
+        if (!chkTerminos.isSelected()) {
+            mostrarAlerta("Términos y condiciones", 
+                         "Debes aceptar los términos y condiciones", 
+                         Alert.AlertType.WARNING);
+            return;
+        }
+
+        if (!validarEmail(email)) {
+            mostrarAlerta("Email inválido", 
+                         "Por favor ingresa un email válido", 
+                         Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            // AQUÍ DEBES INTEGRAR CON TU MICROSERVICIO DE USUARIOS
+            String urlString = "http://localhost:8083/api/usuarios/registro";
+            
+            URL url = new URL(urlString);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setDoOutput(true);
+
+            // Crear JSON con datos del usuario
+            JSONObject json = new JSONObject();
+            json.put("nombre", nombre);
+            json.put("email", email);
+            json.put("usuario", usuario);
+            json.put("password", password);
+
+            // Enviar datos
+            try (OutputStream os = con.getOutputStream()) {
+                byte[] input = json.toString().getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+
+            int responseCode = con.getResponseCode();
+            
+            if (responseCode == 200 || responseCode == 201) {
+                mostrarAlerta("¡Registro exitoso!", 
+                             "Tu cuenta ha sido creada. Ya puedes iniciar sesión.", 
+                             Alert.AlertType.INFORMATION);
+                
+                // Cambiar a la vista de login
+                limpiarCamposRegistro();
+                mostrarLogin();
+                
+            } else {
+                BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getErrorStream(), StandardCharsets.UTF_8)
+                );
+                StringBuilder errorMsg = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    errorMsg.append(line);
+                }
+                in.close();
+                
+                mostrarAlerta("Error en el registro", 
+                             errorMsg.toString(), 
+                             Alert.AlertType.ERROR);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error de conexión", 
+                         "No se pudo conectar con el servidor:\n" + e.getMessage(), 
+                         Alert.AlertType.ERROR);
+        }
+    }
+
+    /**
+     * Recuperar contraseña
+     */
+    @FXML
+    private void recuperarContrasena() {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Recuperar Contraseña");
+        dialog.setHeaderText("Ingresa tu email");
+        dialog.setContentText("Email:");
+
+        dialog.showAndWait().ifPresent(email -> {
+            if (validarEmail(email)) {
+                // AQUÍ INTEGRAR CON TU MICROSERVICIO PARA ENVIAR EMAIL
+                mostrarAlerta("Email enviado", 
+                             "Se ha enviado un enlace de recuperación a tu email", 
+                             Alert.AlertType.INFORMATION);
+            } else {
+                mostrarAlerta("Email inválido", 
+                             "Por favor ingresa un email válido", 
+                             Alert.AlertType.ERROR);
+            }
+        });
+    }
+
+    /**
+     * Ver términos y condiciones
+     */
+    @FXML
+    private void verTerminos() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Términos y Condiciones");
+        alert.setHeaderText("Términos y Condiciones de Uso");
+        alert.setContentText(
+            "1. Aceptación de términos\n" +
+            "2. Uso del servicio\n" +
+            "3. Privacidad de datos\n" +
+            "4. Responsabilidades del usuario\n\n" +
+            "Para ver los términos completos, visita nuestro sitio web."
+        );
+        alert.showAndWait();
+    }
+
+    /**
+     * Volver al inicio
+     */
+    @FXML
+    private void volverInicio() {
+        // AQUÍ DEBES NAVEGAR A LA VISTA PRINCIPAL (vista.fxml)
+        System.out.println("Volver a inicio");
+        // Ejemplo: cargarVista("vista.fxml");
+    }
+
+    /**
+     * Valida formato de email
+     */
+    private boolean validarEmail(String email) {
+        String regex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+        return email.matches(regex);
+    }
+
+    /**
+     * Limpia los campos del formulario de registro
+     */
+    private void limpiarCamposRegistro() {
+        txtRegistroNombre.clear();
+        txtRegistroEmail.clear();
+        txtRegistroUsuario.clear();
+        txtRegistroPassword.clear();
+        txtRegistroConfirmPassword.clear();
+        chkTerminos.setSelected(false);
+    }
+
+    /**
+     * Muestra una alerta
+     */
+    private void mostrarAlerta(String titulo, String mensaje, Alert.AlertType tipo) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(titulo);
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+}

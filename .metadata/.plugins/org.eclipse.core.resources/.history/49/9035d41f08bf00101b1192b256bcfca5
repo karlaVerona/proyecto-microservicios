@@ -1,0 +1,43 @@
+package com.adb.ms.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.adb.ms.model.Torneo;
+import com.adb.ms.repository.TorneoRepository;
+
+@Service
+public class TorneoService {
+
+	@Autowired
+	private TorneoRepository repo;
+	
+	public List<Torneo> mostrar() {
+		return repo.findAll();
+	}
+
+	public Torneo guardar(Torneo tor) {
+		return repo.save(tor);
+	}
+
+	public Optional<Torneo> buscarPorId(int id) {
+		return repo.findById(id);
+	}
+	
+	public List<Torneo> buscarPorDeporte(int idDeporte) {
+        return repo.buscarPorDeporte(idDeporte);
+    }
+	
+	public void eliminar(int id) {
+        repo.deleteById(id);
+    }
+	
+	public List<Torneo> buscarPorNombre(String nombre) {
+	    return repo.findByNombreYClasificacionContainingIgnoreCase(nombre);
+	}
+
+	
+}

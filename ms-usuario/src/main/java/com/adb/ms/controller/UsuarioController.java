@@ -1,0 +1,158 @@
+package com.adb.ms.controller;
+
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.adb.ms.model.Usuario;
+import com.adb.ms.service.UsuarioService;
+import java.util.Optional;
+import org.springframework.web.bind.annotation.DeleteMapping;
+
+@RestController
+@RequestMapping("/usuarios")
+@CrossOrigin(origins = "*")
+public class UsuarioController {
+	
+    @Autowired
+    private UsuarioService service;
+	
+    @GetMapping
+    public List<Usuario> listar() {
+        return service.listar();
+    }
+	
+    @PostMapping("/crear")
+    public Usuario crear(@RequestBody Usuario u) {
+        return service.guardar(u);
+    }
+	
+    @GetMapping("/{id}")
+    public ResponseEntity<Usuario> buscarPorId(@PathVariable Integer id) {
+        return service.buscarPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+	
+    @GetMapping("/nombre/{nombre}")
+    public List<Usuario> buscarPorNombre(@PathVariable String nombre) {
+        return service.buscarPorNombre(nombre);
+    }
+	
+    /**
+     * ⭐ Endpoint de Login
+     * POST /usuarios/login
+     * Body: { "correo": "...", "contrasena": "..." }
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credenciales) {
+        System.out.println("============================================");
+        System.out.println("=== LOGIN - DATOS RECIBIDOS EN BACKEND ===");
+        System.out.println("============================================");
+        System.out.println("Map completo: " + credenciales);
+        System.out.println("Correo del Map: " + credenciales.get("correo"));
+        System.out.println("Contraseña del Map: " + credenciales.get("contrasena"));
+        
+        String correo = credenciales.get("correo");
+        String contrasena = credenciales.get("contrasena");
+        
+        System.out.println("Correo variable: " + correo);
+        System.out.println("Contraseña variable: " + contrasena);
+        
+        if (correo == null || contrasena == null) {
+            System.out.println("❌ ERROR: Correo o contraseña son NULL");
+            return ResponseEntity.badRequest().body("Correo y contraseña son requeridos");
+        }
+        
+        System.out.println("Llamando a service.login()...");
+        Usuario usuario = service.login(correo, contrasena);
+        
+        System.out.println("Usuario retornado del service: " + usuario);
+        
+        if (usuario == null) {
+            System.out.println("❌ Login fallido - Usuario no encontrado o credenciales incorrectas");
+            return ResponseEntity.status(401).body("Correo o contraseña incorrectos");
+        }
+        
+        System.out.println("✅ Login exitoso: " + usuario.getNombre() + " " + usuario.getApellido());
+        
+        // Por seguridad, no enviar la contraseña al frontend
+        usuario.setContrasena(null);
+        
+        System.out.println("============================================");
+        return ResponseEntity.ok(usuario);
+    }
+	
+    /**
+     * ⭐ Endpoint de Registro
+     * POST /usuarios/registro
+     * Body: { "nombre": "...", "apellido": "...", "correo": "...", "contrasena": "..." }
+     */
+    @PostMapping("/registro")
+    public ResponseEntity<?> registrar(@RequestBody Usuario usuario) {
+        System.out.println("============================================");
+        System.out.println("=== REGISTRO - DATOS RECIBIDOS ===");
+        System.out.println("============================================");
+        System.out.println("Nombre: " + usuario.getNombre());
+        System.out.println("Apellido: " + usuario.getApellido());
+        System.out.println("Correo: " + usuario.getCorreo());
+        System.out.println("Contraseña: " + (usuario.getContrasena() != null ? "***" : "null"));
+        
+        if (usuario.getNombre() == null || usuario.getCorreo() == null || usuario.getContrasena() == null) {
+            System.out.println("❌ ERROR: Faltan campos requeridos");
+            return ResponseEntity.badRequest().body("Nombre, correo y contraseña son requeridos");
+        }
+        
+        try {
+            System.out.println("Llamando a service.registrar()...");
+            Usuario nuevoUsuario = service.registrar(usuario);
+            
+            System.out.println("✅ Usuario registrado exitosamente con ID: " + nuevoUsuario.getIdUsuario());
+            
+            // Por seguridad, no enviar la contraseña al frontend
+            nuevoUsuario.setContrasena(null);
+            
+            System.out.println("============================================");
+            return ResponseEntity.status(201).body(nuevoUsuario);
+            
+        } catch (RuntimeException e) {
+            System.out.println("❌ Error en registro: " + e.getMessage());
+            System.out.println("============================================");
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+    
+    /**
+     * Eliminar usuario
+     * DELETE /usuarios/{id}
+     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> eliminarUsuario(@PathVariable Integer id) {
+        System.out.println("=== ELIMINANDO USUARIO ===");
+        System.out.println("ID: " + id);
+        
+        try {
+            Optional<Usuario> usuarioOpt = service.buscarPorId(id);
+            
+            if (usuarioOpt.isEmpty()) {
+                System.out.println("❌ Usuario no encontrado");
+                return ResponseEntity.notFound().build();
+            }
+            
+            service.eliminar(id);
+            
+            System.out.println("✅ Usuario eliminado exitosamente");
+            return ResponseEntity.ok("Usuario eliminado correctamente");
+            
+        } catch (Exception e) {
+            System.out.println("❌ Error al eliminar: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error al eliminar usuario: " + e.getMessage());
+        }
+    }
+}

@@ -1,0 +1,65 @@
+@FXML
+private VBox seccionEstadisticas; // AGREGAR ESTA LÍNEA
+
+@FXML
+void mostrarUsuarios() {
+    ocultarTodasLasSecciones();
+    seccionUsuarios.setVisible(true);
+    seccionEstadisticas.setVisible(true);  // Mostrar estadísticas
+    seccionEstadisticas.setManaged(true);
+    actualizarEstiloTabs(btnTabUsuarios);
+}
+
+@FXML
+void mostrarTorneos() {
+    ocultarTodasLasSecciones();
+    seccionTorneos.setVisible(true);
+    seccionEstadisticas.setVisible(false); // Ocultar estadísticas
+    seccionEstadisticas.setManaged(false);
+    actualizarEstiloTabs(btnTabTorneos);
+}
+
+@FXML
+void mostrarPartidos() {
+    ocultarTodasLasSecciones();
+    seccionPartidos.setVisible(true);
+    seccionEstadisticas.setVisible(false); // Ocultar estadísticas
+    seccionEstadisticas.setManaged(false);
+    actualizarEstiloTabs(btnTabPartidos);
+}
+
+@FXML
+void mostrarSolicitudes() {
+    ocultarTodasLasSecciones();
+    seccionSolicitudes.setVisible(true);
+    seccionEstadisticas.setVisible(false); // Ocultar estadísticas
+    seccionEstadisticas.setManaged(false);
+    actualizarEstiloTabs(btnTabSolicitudes);
+}
+
+@FXML
+void mostrarInscripciones() {
+    ocultarTodasLasSecciones();
+    seccionInscripciones.setVisible(true);
+    seccionEstadisticas.setVisible(false); // Ocultar estadísticas
+    seccionEstadisticas.setManaged(false);
+    actualizarEstiloTabs(btnTabInscripciones);
+}
+
+@FXML
+void mostrarReglas() {
+    ocultarTodasLasSecciones();
+    seccionReglas.setVisible(true);
+    seccionEstadisticas.setVisible(false); // Ocultar estadísticas
+    seccionEstadisticas.setManaged(false);
+    actualizarEstiloTabs(btnTabReglas);
+}
+
+@FXML
+void mostrarHistorial() {
+    ocultarTodasLasSecciones();
+    seccionHistorial.setVisible(true);
+    seccionEstadisticas.setVisible(false); // Ocultar estadísticas
+    seccionEstadisticas.setManaged(false);
+    actualizarEstiloTabs(btnTabHistorial);
+}

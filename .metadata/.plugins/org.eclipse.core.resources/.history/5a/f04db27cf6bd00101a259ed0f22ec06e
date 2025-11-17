@@ -1,0 +1,42 @@
+package com.adb.ms.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+
+import com.adb.ms.model.Deporte;
+
+@Service
+public class DeporteService {
+
+    // Lista de prueba en memoria
+    private final List<Deporte> deportes = List.of(
+        new Deporte(1, "Futbol", "Equipo"),
+        new Deporte(2, "Tenis", "Individual"),
+        new Deporte(3, "Basquetbol", "Equipo")
+    );
+
+    public List<Deporte> mostrar() {
+        return deportes;
+    }
+
+    public Optional<Deporte> buscarPorId(int id) {
+        return deportes.stream().filter(d -> d.getId() == id).findFirst();
+    }
+
+    public List<Deporte> buscarPorNombre(String nombre) {
+        return deportes.stream()
+                       .filter(d -> d.getNombre().equalsIgnoreCase(nombre))
+                       .toList();
+    }
+
+    public Deporte guardar(Deporte d) {
+        d.setId(99); // Simula un ID generado
+        return d;
+    }
+
+    public void eliminar(int id) {
+        // Simula eliminación
+    }
+}

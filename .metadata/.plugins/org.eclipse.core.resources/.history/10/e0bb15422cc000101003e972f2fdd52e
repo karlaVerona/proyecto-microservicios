@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.Image?>
+
+<BorderPane fx:controller="com.adb.fx.controller.PerfilController"
+            xmlns:fx="http://javafx.com/fxml" 
+            prefWidth="1200" 
+            prefHeight="800"
+            stylesheets="@styles.css" 
+            styleClass="root-container">
+
+    <!-- Navbar -->
+    <top>
+        <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="30">
+            <padding>
+                <Insets top="15" right="40" bottom="15" left="40"/>
+            </padding>
+
+            <!-- Logo -->
+            <HBox spacing="12" alignment="CENTER_LEFT">
+                <ImageView fitHeight="40" fitWidth="40" preserveRatio="true">
+                    <image>
+                        <Image url="@images/icon-logo.png"/>
+                    </image>
+                </ImageView>
+                <Label text="Nexus Deportivo" styleClass="logo-text"/>
+            </HBox>
+
+            <Region HBox.hgrow="ALWAYS"/>
+
+            <!-- Botones de navegación -->
+            <Button text="🏆 Torneos" styleClass="nav-button" onAction="#irATorneos"/>
+            <Button text="👤 Mi Perfil" styleClass="nav-button-active"/>
+            <Button text="🚪 Cerrar Sesión" styleClass="nav-button-danger" onAction="#cerrarSesion"/>
+        </HBox>
+    </top>
+
+    <!-- Contenido principal -->
+    <center>
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;">
+            <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 40;">
+                
+                <!-- Header con foto de perfil -->
+                <VBox spacing="20" alignment="CENTER" styleClass="profile-header-card">
+                    <padding>
+                        <Insets top="40" right="40" bottom="40" left="40"/>
+                    </padding>
+                    
+                    <!-- Avatar/Foto -->
+                    <StackPane styleClass="profile-avatar">
+                        <Label text="👤" style="-fx-font-size: 60px;"/>
+                    </StackPane>
+                    
+                    <!-- Nombre del usuario -->
+                    <VBox spacing="5" alignment="CENTER">
+                        <Label fx:id="lblNombreCompleto" text="Camila González" 
+                               styleClass="profile-name"/>
+                        <Label fx:id="lblCorreo" text="camila@gmail.com" 
+                               styleClass="profile-email"/>
+                        <Label fx:id="lblRol" text="🎯 Jugador" 
+                               styleClass="profile-role"/>
+                    </VBox>
+                    
+                    <!-- Fecha de registro -->
+                    <Label fx:id="lblFechaRegistro" text="Miembro desde: Noviembre 2025" 
+                           styleClass="profile-date"/>
+                </VBox>
+
+                <!-- Tabs para diferentes secciones -->
+                <HBox spacing="20" alignment="CENTER" styleClass="profile-tabs">
+                    <Button fx:id="btnTabInformacion" text="📋 Información" 
+                            styleClass="profile-tab-active" 
+                            onAction="#mostrarInformacion"/>
+                    <Button fx:id="btnTabTorneos" text="🏆 Mis Torneos" 
+                            styleClass="profile-tab" 
+                            onAction="#mostrarTorneos"/>
+                    <Button fx:id="btnTabEditar" text="✏️ Editar Perfil" 
+                            styleClass="profile-tab" 
+                            onAction="#mostrarEditar"/>
+                    <Button fx:id="btnTabSeguridad" text="🔒 Seguridad" 
+                            styleClass="profile-tab" 
+                            onAction="#mostrarSeguridad"/>
+                </HBox>
+
+                <!-- StackPane para cambiar entre secciones -->
+                <StackPane prefWidth="900">
+                    
+                    <!-- SECCIÓN: INFORMACIÓN -->
+                    <VBox fx:id="seccionInformacion" spacing="20" visible="true">
+                        
+                        <Label text="Información Personal" styleClass="section-title"/>
+                        
+                        <GridPane hgap="20" vgap="15" styleClass="info-card">
+                            <padding>
+                                <Insets top="30" right="30" bottom="30" left="30"/>
+                            </padding>
+                            
+                            <!-- Nombre -->
+                            <Label text="Nombre:" GridPane.columnIndex="0" GridPane.rowIndex="0" 
+                                   styleClass="info-label"/>
+                            <Label fx:id="lblInfoNombre" text="Camila" GridPane.columnIndex="1" GridPane.rowIndex="0" 
+                                   styleClass="info-value"/>
+                            
+                            <!-- Apellido -->
+                            <Label text="Apellido:" GridPane.columnIndex="0" GridPane.rowIndex="1" 
+                                   styleClass="info-label"/>
+                            <Label fx:id="lblInfoApellido" text="González" GridPane.columnIndex="1" GridPane.rowIndex="1" 
+                                   styleClass="info-value"/>
+                            
+                            <!-- Email -->
+                            <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="2" 
+                                   styleClass="info-label"/>
+                            <Label fx:id="lblInfoCorreo" text="camila@gmail.com" GridPane.columnIndex="1" GridPane.rowIndex="2" 
+                                   styleClass="info-value"/>
+                            
+                            <!-- Rol -->
+                            <Label text="Rol:" GridPane.columnIndex="0" GridPane.rowIndex="3" 
+                                   styleClass="info-label"/>
+                            <Label fx:id="lblInfoRol" text="Jugador" GridPane.columnIndex="1" GridPane.rowIndex="3" 
+                                   styleClass="info-value"/>
+                            
+                            <!-- Deporte favorito -->
+                            <Label text="Deporte:" GridPane.columnIndex="0" GridPane.rowIndex="4" 
+                                   styleClass="info-label"/>
+                            <Label fx:id="lblInfoDeporte" text="Fútbol" GridPane.columnIndex="1" GridPane.rowIndex="4" 
+                                   styleClass="info-value"/>
+                        </GridPane>
+                        
+                    </VBox>
+
+                    <!-- SECCIÓN: MIS TORNEOS -->
+                    <VBox fx:id="seccionTorneos" spacing="20" visible="false">
+                        
+                        <Label text="Gestión de Torneos" styleClass="section-title"/>
+                        
+                        <!-- Subsección: Inscribirse a Torneo -->
+                        <VBox spacing="15" styleClass="form-card">
+                            <padding>
+                                <Insets top="25" right="25" bottom="25" left="25"/>
+                            </padding>
+                            
+                            <Label text="🎯 Inscribirse a un Torneo" styleClass="subsection-title"/>
+                            
+                            <HBox spacing="15" alignment="CENTER_LEFT">
+                                <VBox spacing="8" HBox.hgrow="ALWAYS">
+                                    <Label text="Selecciona un Torneo" styleClass="form-label"/>
+                                    <ComboBox fx:id="cmbTorneosDisponibles" 
+                                             promptText="Elige un torneo para inscribirte"
+                                             styleClass="form-combo" 
+                                             prefWidth="500"/>
+                                </VBox>
+                                <Button text="📝 Inscribirme" styleClass="btn-primary" 
+                                       onAction="#inscribirseATorneo" prefWidth="150"
+                                       style="-fx-margin-top: 25;"/>
+                            </HBox>
+                            
+                            <Label text="Selecciona el torneo en el que deseas participar y haz clic en inscribirme." 
+                                   styleClass="info-text" wrapText="true"/>
+                        </VBox>
+                        
+                        <!-- Subsección: Mis Inscripciones -->
+                        <VBox spacing="15">
+                            <Label text="📋 Mis Inscripciones Activas" styleClass="subsection-title"/>
+                            
+                            <TableView fx:id="tablaMisInscripciones" styleClass="data-table" prefHeight="300">
+                                <columns>
+                                    <TableColumn fx:id="colTorneoNombre" text="Torneo" prefWidth="250"/>
+                                    <TableColumn fx:id="colTorneoDeporte" text="Deporte" prefWidth="120"/>
+                                    <TableColumn fx:id="colTorneoFecha" text="Fecha Inicio" prefWidth="120"/>
+                                    <TableColumn fx:id="colTorneoEstado" text="Estado" prefWidth="120"/>
+                                    <TableColumn fx:id="colTorneoAcciones" text="Acciones" prefWidth="150"/>
+                                </columns>
+                            </TableView>
+                            
+                            <Label text="Aquí puedes ver todos los torneos en los que estás inscrito." 
+                                   styleClass="info-text"/>
+                        </VBox>
+                        
+                    </VBox>
+
+                    <!-- SECCIÓN: EDITAR PERFIL -->
+                    <VBox fx:id="seccionEditar" spacing="20" visible="false">
+                        
+                        <Label text="Editar Mi Perfil" styleClass="section-title"/>
+                        
+                        <VBox spacing="20" styleClass="form-card">
+                            <padding>
+                                <Insets top="30" right="30" bottom="30" left="30"/>
+                            </padding>
+                            
+                            <!-- Nombre -->
+                            <VBox spacing="8">
+                                <Label text="Nombre *" styleClass="form-label"/>
+                                <TextField fx:id="txtEditarNombre" styleClass="form-input"/>
+                            </VBox>
+                            
+                            <!-- Apellido -->
+                            <VBox spacing="8">
+                                <Label text="Apellido *" styleClass="form-label"/>
+                                <TextField fx:id="txtEditarApellido" styleClass="form-input"/>
+                            </VBox>
+                            
+                            <!-- Email -->
+                            <VBox spacing="8">
+                                <Label text="Email *" styleClass="form-label"/>
+                                <TextField fx:id="txtEditarCorreo" styleClass="form-input"/>
+                            </VBox>
+                            
+                            <!-- Deporte -->
+                            <VBox spacing="8">
+                                <Label text="Deporte Favorito" styleClass="form-label"/>
+                                <ComboBox fx:id="cmbEditarDeporte" promptText="Selecciona un deporte" 
+                                         styleClass="form-combo" prefWidth="400"/>
+                            </VBox>
+                            
+                            <!-- Botones -->
+                            <HBox spacing="15" alignment="CENTER">
+                                <Button text="💾 Guardar Cambios" styleClass="btn-primary" 
+                                       onAction="#guardarCambios" prefWidth="200"/>
+                                <Button text="❌ Cancelar" styleClass="btn-secondary" 
+                                       onAction="#cancelarEdicion" prefWidth="200"/>
+                            </HBox>
+                        </VBox>
+                        
+                    </VBox>
+
+                    <!-- SECCIÓN: SEGURIDAD -->
+                    <VBox fx:id="seccionSeguridad" spacing="25" visible="false">
+                        
+                        <Label text="Seguridad de la Cuenta" styleClass="section-title"/>
+                        
+                        <!-- Cambiar Contraseña -->
+                        <VBox spacing="15" styleClass="form-card">
+                            <padding>
+                                <Insets top="30" right="30" bottom="30" left="30"/>
+                            </padding>
+                            
+                            <Label text="🔐 Cambiar Contraseña" styleClass="subsection-title"/>
+                            
+                            <!-- Contraseña actual -->
+                            <VBox spacing="8">
+                                <Label text="Contraseña Actual *" styleClass="form-label"/>
+                                <PasswordField fx:id="txtPasswordActual" 
+                                             promptText="Ingresa tu contraseña actual"
+                                             styleClass="form-input"/>
+                            </VBox>
+                            
+                            <!-- Nueva contraseña -->
+                            <VBox spacing="8">
+                                <Label text="Nueva Contraseña *" styleClass="form-label"/>
+                                <PasswordField fx:id="txtPasswordNueva" 
+                                             promptText="Mínimo 8 caracteres"
+                                             styleClass="form-input"/>
+                            </VBox>
+                            
+                            <!-- Confirmar contraseña -->
+                            <VBox spacing="8">
+                                <Label text="Confirmar Nueva Contraseña *" styleClass="form-label"/>
+                                <PasswordField fx:id="txtPasswordConfirmar" 
+                                             promptText="Repite la nueva contraseña"
+                                             styleClass="form-input"/>
+                            </VBox>
+                            
+                            <!-- Botón -->
+                            <HBox alignment="CENTER">
+                                <Button text="🔐 Cambiar Contraseña" styleClass="btn-primary" 
+                                       onAction="#cambiarPassword" prefWidth="250"/>
+                            </HBox>
+                        </VBox>
+                        
+                        <!-- Zona de Peligro - Eliminar Cuenta -->
+                        <VBox spacing="15" styleClass="danger-card">
+                            <padding>
+                                <Insets top="30" right="30" bottom="30" left="30"/>
+                            </padding>
+                            
+                            <Label text="⚠️ Zona de Peligro" styleClass="danger-title"/>
+                            
+                            <VBox spacing="10">
+                                <Label text="Eliminar mi cuenta" styleClass="danger-subtitle"/>
+                                <Label text="Una vez que elimines tu cuenta, no hay vuelta atrás. Esta acción es permanente y eliminará todos tus datos, inscripciones a torneos y estadísticas." 
+                                       styleClass="danger-text" wrapText="true"/>
+                            </VBox>
+                            
+                            <HBox alignment="CENTER">
+                                <Button text="🗑️ Eliminar Mi Cuenta" styleClass="btn-danger" 
+                                       onAction="#eliminarCuenta" prefWidth="250"/>
+                            </HBox>
+                        </VBox>
+                        
+                    </VBox>
+
+                </StackPane>
+
+            </VBox>
+        </ScrollPane>
+    </center>
+
+</BorderPane>

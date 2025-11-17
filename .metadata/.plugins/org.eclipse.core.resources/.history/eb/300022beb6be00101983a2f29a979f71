@@ -1,0 +1,39 @@
+package com.adb.fx.controller;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.Text;
+
+public class VistaController {
+
+    @FXML private TextField txtBuscar;
+    @FXML private ComboBox<String> cmbDeporte;
+    @FXML private DatePicker dpFecha;
+    @FXML private FlowPane contenedorEventos;
+
+    @FXML
+    public void initialize() {
+        cmbDeporte.getItems().addAll("Ciclismo", "Natación", "Carrera", "Triatlón");
+    }
+
+    @FXML
+    private void buscarEvento() {
+        contenedorEventos.getChildren().clear();
+
+        String nombre = txtBuscar.getText();
+        String deporte = cmbDeporte.getValue();
+        String fecha = (dpFecha.getValue() != null) ? dpFecha.getValue().toString() : "sin fecha";
+
+        VBox tarjeta = new VBox(5);
+        tarjeta.setStyle("-fx-background-color: white; -fx-padding: 10; -fx-border-color: #ddd; -fx-border-radius: 8; -fx-background-radius: 8;");
+        tarjeta.getChildren().addAll(
+                new Text("Evento: " + nombre),
+                new Text("Deporte: " + deporte),
+                new Text("Fecha: " + fecha)
+        );
+
+        contenedorEventos.getChildren().add(tarjeta);
+    }
+}

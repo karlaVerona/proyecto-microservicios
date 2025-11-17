@@ -1,0 +1,93 @@
+.root {
+    -fx-font-family: "Segoe UI";
+    font-family: "Segoe UI"; /* estándar */
+    -fx-background-color: #f9f9f9;
+    background-color: #f9f9f9;
+}
+
+/* Barra superior */
+.navbar {
+    -fx-background-color: #ff6600;
+    background-color: #ff6600;
+}
+
+.logo {
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-size: 20px;
+    font-size: 20px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.nav-button {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+.nav-button:hover {
+    -fx-underline: true;
+    text-decoration: underline;
+}
+
+.login-button {
+    -fx-background-color: #222;
+    background-color: #222;
+    -fx-text-fill: white;
+    color: white;
+    -fx-padding: 6 12;
+    -fx-background-radius: 5;
+    border-radius: 5px;
+}
+
+.banner {
+    -fx-background-image: url("https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf");
+    -fx-background-size: cover;
+    background-size: cover;
+    -fx-background-position: center;
+    background-position: center;
+    -fx-alignment: center;
+}
+
+.banner-text {
+    -fx-text-fill: white;
+    color: white;
+    -fx-font-size: 28px;
+    font-size: 28px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-effect: dropshadow(gaussian, black, 6, 0, 0, 1);
+}
+
+.buscar-button {
+    -fx-background-color: #ff6600;
+    background-color: #ff6600;
+    -fx-text-fill: white;
+    color: white;
+    -fx-padding: 8 15;
+    padding: 8px 15px;
+    -fx-background-radius: 5;
+    border-radius: 5px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}
+
+.buscar-button:hover {
+    -fx-background-color: #e05500;
+    background-color: #e05500;
+}
+
+.section-title {
+    -fx-font-size: 18px;
+    font-size: 18px;
+    -fx-font-weight: bold;
+    font-weight: bold;
+    -fx-text-fill: #333;
+    color: #333;
+}

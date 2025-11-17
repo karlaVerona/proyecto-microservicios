@@ -1,0 +1,60 @@
+package com.adb.ms.service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import com.adb.ms.model.Usuario;
+import com.adb.ms.repository.UsuarioRepository;
+
+@Service
+public class UsuarioService {
+	
+    @Autowired
+    private UsuarioRepository repo;
+	
+    public List<Usuario> listar() {
+        return repo.findAll();
+    }
+    
+    public Usuario guardar(Usuario u) {
+        return repo.save(u);
+    }
+    
+    public Optional<Usuario> buscarPorId(Integer id) {
+        return repo.findById(id);
+    }
+    
+    public List<Usuario> buscarPorNombre(String nombre) {
+        return repo.buscarPorNombre(nombre);
+    }
+    
+    /**
+     * Login: busca usuario por correo y contraseña
+     * Retorna el usuario si existe, null si no existe
+     */
+    public Usuario login(String correo, String contrasena) {
+        return repo.buscarPorCorreoYContrasena(correo, contrasena);
+    }
+    
+    /**
+     * Registrar: crea un nuevo usuario
+     * Verifica que el correo no exista antes de guardar
+     */
+    public Usuario registrar(Usuario usuario) {
+        // 1. Verificar si el correo ya existe
+        Usuario usuarioExistente = repo.buscarPorCorreo(usuario.getCorreo());
+        
+        if (usuarioExistente != null) {
+            // Si el correo ya existe, lanzar excepción
+            throw new RuntimeException("El correo ya está registrado");
+        }
+        
+        // 2. Establecer fecha de registro
+        usuario.setFechaRegistro(LocalDate.now());
+        
+        // 3. Guardar y retornar el usuario
+        return repo.save(usuario);
+    }
+}

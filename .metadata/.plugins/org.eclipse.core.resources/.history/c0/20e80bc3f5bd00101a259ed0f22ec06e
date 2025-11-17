@@ -1,0 +1,21 @@
+package com.adb.ms.controller;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+import com.adb.ms.model.Deporte;
+import com.adb.ms.repository.DeporteRepository;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/deportes")
+public class DeporteController {
+
+    @Autowired
+    private DeporteRepository deporteRepository;
+
+    @GetMapping
+    public List<Deporte> listarDeportes() {
+        return deporteRepository.findAll();
+    }
+}

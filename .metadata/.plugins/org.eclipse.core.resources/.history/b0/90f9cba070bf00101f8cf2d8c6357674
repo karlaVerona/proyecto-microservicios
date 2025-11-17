@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+             fx:controller="com.adb.interfazjavafx.controller.PerfilController">
+
+    <top>
+        <Label text="Bienvenido, Usuario" style="-fx-font-size: 20px; -fx-font-weight: bold;" BorderPane.alignment="CENTER"/>
+    </top>
+
+    <center>
+        <VBox spacing="15" alignment="CENTER">
+            <Button text="Ver Perfil" onAction="#verPerfil"/>
+            <Button text="Deportes" onAction="#verDeportes"/>
+            <Button text="Torneos" onAction="#verTorneos"/>
+            <Button text="Equipos" onAction="#verEquipos"/>
+        </VBox>
+    </center>
+</BorderPane>

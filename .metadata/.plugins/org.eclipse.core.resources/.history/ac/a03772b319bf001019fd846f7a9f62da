@@ -1,0 +1,54 @@
+package com.adb.fx.controller;
+
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import java.io.IOException;
+
+public class LoginController {
+
+    @FXML private TextField correoField;
+    @FXML private PasswordField contrasenaField;
+    @FXML private Label mensajeLabel;
+
+    @FXML
+    private void iniciarSesion(ActionEvent event) {
+        String correo = correoField.getText();
+        String contrasena = contrasenaField.getText();
+
+        if (correo.equals("admin@correo.com") && contrasena.equals("1234")) {
+            mensajeLabel.setText("");
+            irAPerfil();
+        } else {
+            mensajeLabel.setText("Correo o contraseña incorrectos.");
+        }
+    }
+
+    @FXML
+    private void irARegistro(ActionEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Registro.fxml"));
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) correoField.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle("Registrar Usuario");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void irAPerfil() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Perfil.fxml"));
+            Scene scene = new Scene(loader.load());
+            Stage stage = (Stage) correoField.getScene().getWindow();
+            stage.setScene(scene);
+            stage.setTitle("Perfil del Usuario");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}

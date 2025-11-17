@@ -1,0 +1,62 @@
+package com.adb.fx.controller;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import java.net.http.*;
+import java.net.URI;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.adb.fx.model.Usuario;
+
+public class LoginController {
+
+    @FXML private TextField txtUsuario;
+    @FXML private PasswordField txtPassword;
+    @FXML private Label lblMensaje;
+
+    @FXML
+    private void login() {
+        try {
+            String url = "http://localhost:8081/usuarios/login?username=" + txtUsuario.getText()
+                    + "&password=" + txtPassword.getText();
+
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                ObjectMapper mapper = new ObjectMapper();
+                Usuario usuario = mapper.readValue(response.body(), Usuario.class);
+
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/Perfil.fxml"));
+                Parent root = loader.load();
+
+                Stage stage = (Stage) txtUsuario.getScene().getWindow();
+                stage.setScene(new Scene(root));
+                stage.setTitle("Perfil de " + usuario.getNombre());
+                stage.show();
+
+            } else {
+                lblMensaje.setText("Usuario o contraseña incorrectos.");
+            }
+        } catch (Exception e) {
+            lblMensaje.setText("Error de conexión con el servidor.");
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void irARegistro() {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/Registro.fxml"));
+            Stage stage = (Stage) txtUsuario.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Registro de Usuario");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

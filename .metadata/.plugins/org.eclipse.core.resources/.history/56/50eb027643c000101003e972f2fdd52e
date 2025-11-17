@@ -1,0 +1,681 @@
+package com.adb.fx.controller;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.adb.fx.model.Usuario;
+import com.adb.fx.model.Torneo;
+
+public class PerfilController {
+
+    // ========== TABS ==========
+    @FXML private Button btnTabInformacion;
+    @FXML private Button btnTabMisTorneos;
+    @FXML private Button btnTabMisEquipos;
+    @FXML private Button btnTabHistorial;
+    @FXML private Button btnTabSolicitudes;
+    @FXML private Button btnTabConfiguracion;
+
+    // ========== SECCIONES ==========
+    @FXML private VBox seccionInformacion;
+    @FXML private VBox seccionMisTorneos;
+    @FXML private VBox seccionMisEquipos;
+    @FXML private VBox seccionHistorial;
+    @FXML private VBox seccionSolicitudes;
+    @FXML private VBox seccionConfiguracion;
+
+    // ========== HEADER ==========
+    @FXML private Label lblNombreCompleto;
+    @FXML private Label lblCorreo;
+    @FXML private Label lblRolBadge;
+    @FXML private Label lblFechaRegistro;
+    @FXML private Label lblTotalTorneos;
+    @FXML private Label lblTotalEquipos;
+
+    // ========== INFORMACIÓN ==========
+    @FXML private Label lblInfoNombre;
+    @FXML private Label lblInfoApellido;
+    @FXML private Label lblInfoCorreo;
+    @FXML private Label lblInfoRol;
+    @FXML private Label lblInfoDeporte;
+    @FXML private Label lblInfoFechaRegistro;
+
+    // ========== MIS TORNEOS ==========
+    @FXML private ComboBox<String> cmbTorneosDisponibles;
+    @FXML private TableView<Torneo> tablaMisInscripciones;
+    @FXML private TableColumn<Torneo, String> colTorneoNombre;
+    @FXML private TableColumn<Torneo, String> colTorneoDeporte;
+    @FXML private TableColumn<Torneo, String> colTorneoFecha;
+    @FXML private TableColumn<Torneo, String> colTorneoEstado;
+    @FXML private TableColumn<Torneo, Void> colTorneoAcciones;
+    @FXML private Label lblContadorInscripciones;
+
+    // ========== MIS EQUIPOS ==========
+    @FXML private VBox cardCrearEquipo;
+    @FXML private TextField txtNombreEquipo;
+    @FXML private ComboBox<String> cmbDeporteEquipo;
+    @FXML private TextArea txtDescripcionEquipo;
+    @FXML private TableView<?> tablaMisEquipos;
+    @FXML private TableColumn<?, String> colEquipoNombre;
+    @FXML private TableColumn<?, String> colEquipoDeporte;
+    @FXML private TableColumn<?, String> colEquipoRol;
+    @FXML private TableColumn<?, String> colEquipoMiembros;
+    @FXML private TableColumn<?, String> colEquipoEstado;
+    @FXML private TableColumn<?, Void> colEquipoAcciones;
+    @FXML private Label lblContadorEquipos;
+
+    // ========== HISTORIAL ==========
+    @FXML private Label lblHistorialTorneos;
+    @FXML private Label lblHistorialPartidos;
+    @FXML private Label lblHistorialVictorias;
+    @FXML private Label lblHistorialWinRate;
+    @FXML private TableView<?> tablaHistorialPartidos;
+    @FXML private TableColumn<?, String> colHistorialFecha;
+    @FXML private TableColumn<?, String> colHistorialTorneo;
+    @FXML private TableColumn<?, String> colHistorialEquipo;
+    @FXML private TableColumn<?, String> colHistorialRival;
+    @FXML private TableColumn<?, String> colHistorialResultado;
+    @FXML private TableColumn<?, String> colHistorialEstado;
+
+    // ========== SOLICITUDES ==========
+    @FXML private TextArea txtRazonCapitan;
+    @FXML private TextArea txtRazonArbitro;
+    @FXML private Label lblEstadoSolicitudCapitan;
+    @FXML private Label lblEstadoSolicitudArbitro;
+    @FXML private TableView<?> tablaSolicitudes;
+    @FXML private TableColumn<?, String> colSolicitudTipo;
+    @FXML private TableColumn<?, String> colSolicitudFecha;
+    @FXML private TableColumn<?, String> colSolicitudEstado;
+    @FXML private TableColumn<?, String> colSolicitudRespuesta;
+    @FXML private TableColumn<?, Void> colSolicitudAcciones;
+
+    // ========== CONFIGURACIÓN ==========
+    @FXML private TextField txtEditarNombre;
+    @FXML private TextField txtEditarApellido;
+    @FXML private TextField txtEditarCorreo;
+    @FXML private ComboBox<String> cmbEditarDeporte;
+
+    // ========== DATOS ==========
+    private Usuario usuarioActual;
+    private ObservableList<Torneo> listaTorneosInscritos = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        // Configurar combos
+        ObservableList<String> deportes = FXCollections.observableArrayList(
+            "Fútbol", "Baloncesto", "Tenis", "Natación", "Voleibol"
+        );
+        cmbEditarDeporte.setItems(deportes);
+        cmbDeporteEquipo.setItems(deportes);
+
+        // Configurar tablas
+        configurarTablaTorneos();
+        
+        // Mostrar sección de información por defecto
+        mostrarInformacion();
+        
+        // Inicializar estadísticas de ejemplo
+        lblHistorialTorneos.setText("12");
+        lblHistorialPartidos.setText("45");
+        lblHistorialVictorias.setText("28");
+        lblHistorialWinRate.setText("62%");
+    }
+
+    /**
+     * Configura la tabla de torneos inscritos
+     */
+    private void configurarTablaTorneos() {
+        colTorneoNombre.setCellValueFactory(new PropertyValueFactory<>("nombreYClasificacion"));
+        colTorneoDeporte.setCellValueFactory(c -> 
+            new javafx.beans.property.SimpleStringProperty("Deporte " + c.getValue().getIdDeporte()));
+        colTorneoFecha.setCellValueFactory(c -> 
+            new javafx.beans.property.SimpleStringProperty(
+                c.getValue().getFechaInicio() != null ? c.getValue().getFechaInicio().toString() : ""));
+        colTorneoEstado.setCellValueFactory(c -> 
+            new javafx.beans.property.SimpleStringProperty("✅ Activo"));
+
+        tablaMisInscripciones.setItems(listaTorneosInscritos);
+    }
+
+    /**
+     * Establece el usuario actual y carga sus datos
+     */
+    public void setUsuario(Usuario usuario) {
+        this.usuarioActual = usuario;
+        cargarDatosUsuario();
+        cargarTorneosDisponibles();
+        verificarRolCapitan();
+    }
+
+    /**
+     * Carga los datos del usuario en todos los componentes
+     */
+    private void cargarDatosUsuario() {
+        if (usuarioActual == null) return;
+
+        String nombreCompleto = usuarioActual.getNombre() + " " + usuarioActual.getApellido();
+        String rol = usuarioActual.getRol() != null ? usuarioActual.getRol() : "Jugador";
+        String fechaRegistroStr = usuarioActual.getFechaRegistro() != null ? 
+            usuarioActual.getFechaRegistro().toString() : "N/A";
+
+        // Header
+        lblNombreCompleto.setText(nombreCompleto);
+        lblCorreo.setText(usuarioActual.getCorreo());
+        lblRolBadge.setText("🎯 " + rol);
+        
+        // Formatear fecha de manera más amigable
+        String fechaCorta = fechaRegistroStr;
+        if (fechaRegistroStr.length() >= 7) {
+            String[] partes = fechaRegistroStr.split("-");
+            if (partes.length >= 2) {
+                String[] meses = {"", "Ene", "Feb", "Mar", "Abr", "May", "Jun", 
+                                "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"};
+                int mes = Integer.parseInt(partes[1]);
+                fechaCorta = meses[mes] + " " + partes[0];
+            }
+        }
+        lblFechaRegistro.setText(fechaCorta);
+        
+        lblTotalTorneos.setText("3");
+        lblTotalEquipos.setText("2");
+
+        // Información
+        lblInfoNombre.setText(usuarioActual.getNombre());
+        lblInfoApellido.setText(usuarioActual.getApellido());
+        lblInfoCorreo.setText(usuarioActual.getCorreo());
+        lblInfoRol.setText(rol);
+        lblInfoDeporte.setText("Fútbol");
+        lblInfoFechaRegistro.setText(fechaRegistroStr);
+
+        // Editar
+        txtEditarNombre.setText(usuarioActual.getNombre());
+        txtEditarApellido.setText(usuarioActual.getApellido());
+        txtEditarCorreo.setText(usuarioActual.getCorreo());
+        
+        // Contadores
+        lblContadorInscripciones.setText(listaTorneosInscritos.size() + " torneos");
+        lblContadorEquipos.setText("2 equipos");
+    }
+
+    /**
+     * Verifica si el usuario es capitán para mostrar/ocultar opciones
+     */
+    private void verificarRolCapitan() {
+        if (usuarioActual == null) return;
+        
+        String rol = usuarioActual.getRol() != null ? usuarioActual.getRol().toLowerCase() : "jugador";
+        boolean esCapitan = rol.contains("capitan") || rol.contains("capitán");
+        
+        // Mostrar u ocultar card de crear equipo según el rol
+        if (cardCrearEquipo != null) {
+            cardCrearEquipo.setVisible(esCapitan);
+            cardCrearEquipo.setManaged(esCapitan);
+        }
+    }
+
+    /**
+     * Carga los torneos disponibles del backend
+     */
+    private void cargarTorneosDisponibles() {
+        try {
+            String urlString = "http://localhost:8080/torneos";
+            URL url = new URL(urlString);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+
+            int responseCode = con.getResponseCode();
+            if (responseCode == 200) {
+                BufferedReader in = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8)
+                );
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+                in.close();
+
+                JSONArray arr = new JSONArray(response.toString());
+                ObservableList<String> torneos = FXCollections.observableArrayList();
+
+                for (int i = 0; i < arr.length(); i++) {
+                    JSONObject obj = arr.getJSONObject(i);
+                    String nombreTorneo = obj.optString("nombreYClasificacion");
+                    torneos.add(nombreTorneo);
+                }
+
+                cmbTorneosDisponibles.setItems(torneos);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("Error al cargar torneos: " + e.getMessage());
+        }
+    }
+
+    // ==================== NAVEGACIÓN ENTRE TABS ====================
+
+    @FXML
+    private void mostrarInformacion() {
+        cambiarTab(btnTabInformacion, seccionInformacion);
+    }
+
+    @FXML
+    private void mostrarTorneos() {
+        cambiarTab(btnTabMisTorneos, seccionMisTorneos);
+    }
+
+    @FXML
+    private void mostrarEquipos() {
+        cambiarTab(btnTabMisEquipos, seccionMisEquipos);
+    }
+
+    @FXML
+    private void mostrarHistorial() {
+        cambiarTab(btnTabHistorial, seccionHistorial);
+    }
+
+    @FXML
+    private void mostrarSolicitudes() {
+        cambiarTab(btnTabSolicitudes, seccionSolicitudes);
+    }
+
+    @FXML
+    private void mostrarConfiguracion() {
+        cambiarTab(btnTabConfiguracion, seccionConfiguracion);
+    }
+
+    /**
+     * Cambia la tab activa y muestra la sección correspondiente
+     */
+    private void cambiarTab(Button tabActivo, VBox seccionActiva) {
+        // Ocultar todas las secciones
+        seccionInformacion.setVisible(false);
+        seccionMisTorneos.setVisible(false);
+        seccionMisEquipos.setVisible(false);
+        seccionHistorial.setVisible(false);
+        seccionSolicitudes.setVisible(false);
+        seccionConfiguracion.setVisible(false);
+
+        // Mostrar la sección activa
+        seccionActiva.setVisible(true);
+
+        // Actualizar estilos de tabs
+        btnTabInformacion.getStyleClass().clear();
+        btnTabMisTorneos.getStyleClass().clear();
+        btnTabMisEquipos.getStyleClass().clear();
+        btnTabHistorial.getStyleClass().clear();
+        btnTabSolicitudes.getStyleClass().clear();
+        btnTabConfiguracion.getStyleClass().clear();
+
+        btnTabInformacion.getStyleClass().add("tab-btn");
+        btnTabMisTorneos.getStyleClass().add("tab-btn");
+        btnTabMisEquipos.getStyleClass().add("tab-btn");
+        btnTabHistorial.getStyleClass().add("tab-btn");
+        btnTabSolicitudes.getStyleClass().add("tab-btn");
+        btnTabConfiguracion.getStyleClass().add("tab-btn");
+
+        tabActivo.getStyleClass().clear();
+        tabActivo.getStyleClass().add("tab-btn-active");
+    }
+
+    // ==================== FUNCIONES DE TORNEOS ====================
+
+    @FXML
+    private void inscribirseATorneo() {
+        String torneoSeleccionado = cmbTorneosDisponibles.getValue();
+
+        if (torneoSeleccionado == null || torneoSeleccionado.isEmpty()) {
+            mostrarAlerta("Por favor selecciona un torneo", Alert.AlertType.WARNING);
+            return;
+        }
+
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar Inscripción");
+        confirmacion.setHeaderText("¿Deseas inscribirte a este torneo?");
+        confirmacion.setContentText("Torneo: " + torneoSeleccionado);
+
+        confirmacion.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    // TODO: Implementar endpoint de inscripción en el backend
+                    mostrarAlerta("✅ ¡Te has inscrito exitosamente al torneo!\n\n" +
+                                "Torneo: " + torneoSeleccionado, 
+                                Alert.AlertType.INFORMATION);
+                    
+                    // Actualizar contador
+                    lblContadorInscripciones.setText((listaTorneosInscritos.size() + 1) + " torneos");
+                    
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    mostrarAlerta("Error al inscribirse: " + e.getMessage(), Alert.AlertType.ERROR);
+                }
+            }
+        });
+    }
+
+    // ==================== FUNCIONES DE EQUIPOS ====================
+
+    @FXML
+    private void crearEquipo() {
+        String nombre = txtNombreEquipo.getText().trim();
+        String deporte = cmbDeporteEquipo.getValue();
+        String descripcion = txtDescripcionEquipo.getText().trim();
+
+        if (nombre.isEmpty() || deporte == null || deporte.isEmpty()) {
+            mostrarAlerta("Por favor completa los campos obligatorios (Nombre y Deporte)", 
+                         Alert.AlertType.WARNING);
+            return;
+        }
+
+        // Verificar si es capitán
+        String rol = usuarioActual.getRol() != null ? usuarioActual.getRol().toLowerCase() : "jugador";
+        if (!rol.contains("capitan") && !rol.contains("capitán")) {
+            mostrarAlerta("❌ Necesitas ser capitán para crear equipos.\n\n" +
+                         "Ve a la sección 'Solicitudes' para solicitar el rol de capitán.", 
+                         Alert.AlertType.ERROR);
+            return;
+        }
+
+        try {
+            // TODO: Implementar creación de equipo en el backend
+            mostrarAlerta("✅ ¡Equipo creado exitosamente!\n\n" +
+                         "Nombre: " + nombre + "\n" +
+                         "Deporte: " + deporte, 
+                         Alert.AlertType.INFORMATION);
+            
+            // Limpiar campos
+            txtNombreEquipo.clear();
+            cmbDeporteEquipo.setValue(null);
+            txtDescripcionEquipo.clear();
+            
+            // Actualizar contador
+            lblContadorEquipos.setText("3 equipos");
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error al crear equipo: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    // ==================== FUNCIONES DE SOLICITUDES ====================
+
+    @FXML
+    private void solicitarCapitan() {
+        String razon = txtRazonCapitan.getText().trim();
+
+        if (razon.isEmpty() || razon.length() < 20) {
+            mostrarAlerta("Por favor explica detalladamente por qué deberías ser capitán (mínimo 20 caracteres)", 
+                         Alert.AlertType.WARNING);
+            return;
+        }
+
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar Solicitud");
+        confirmacion.setHeaderText("¿Enviar solicitud para ser Capitán?");
+        confirmacion.setContentText("Tu solicitud será revisada por un administrador.");
+
+        confirmacion.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    // TODO: Implementar endpoint de solicitud en el backend
+                    System.out.println("=== SOLICITUD DE CAPITÁN ===");
+                    System.out.println("Usuario: " + usuarioActual.getIdUsuario());
+                    System.out.println("Razón: " + razon);
+                    
+                    mostrarAlerta("✅ Solicitud enviada exitosamente\n\n" +
+                                "Tu solicitud para ser capitán ha sido enviada al administrador.\n" +
+                                "Recibirás una notificación cuando sea revisada.", 
+                                Alert.AlertType.INFORMATION);
+                    
+                    lblEstadoSolicitudCapitan.setVisible(true);
+                    txtRazonCapitan.clear();
+                    
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    mostrarAlerta("Error al enviar solicitud: " + e.getMessage(), Alert.AlertType.ERROR);
+                }
+            }
+        });
+    }
+
+    @FXML
+    private void solicitarArbitro() {
+        String experiencia = txtRazonArbitro.getText().trim();
+
+        if (experiencia.isEmpty() || experiencia.length() < 20) {
+            mostrarAlerta("Por favor describe tu experiencia como árbitro (mínimo 20 caracteres)", 
+                         Alert.AlertType.WARNING);
+            return;
+        }
+
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Confirmar Solicitud");
+        confirmacion.setHeaderText("¿Enviar solicitud para ser Árbitro?");
+        confirmacion.setContentText("Tu solicitud será revisada por un administrador.");
+
+        confirmacion.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try {
+                    // TODO: Implementar endpoint de solicitud en el backend
+                    System.out.println("=== SOLICITUD DE ÁRBITRO ===");
+                    System.out.println("Usuario: " + usuarioActual.getIdUsuario());
+                    System.out.println("Experiencia: " + experiencia);
+                    
+                    mostrarAlerta("✅ Solicitud enviada exitosamente\n\n" +
+                                "Tu solicitud para ser árbitro ha sido enviada al administrador.\n" +
+                                "Recibirás una notificación cuando sea revisada.", 
+                                Alert.AlertType.INFORMATION);
+                    
+                    lblEstadoSolicitudArbitro.setVisible(true);
+                    txtRazonArbitro.clear();
+                    
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    mostrarAlerta("Error al enviar solicitud: " + e.getMessage(), Alert.AlertType.ERROR);
+                }
+            }
+        });
+    }
+
+    // ==================== FUNCIONES DE CONFIGURACIÓN ====================
+
+    @FXML
+    private void guardarCambios() {
+        String nombre = txtEditarNombre.getText().trim();
+        String apellido = txtEditarApellido.getText().trim();
+        String correo = txtEditarCorreo.getText().trim();
+
+        if (nombre.isEmpty() || apellido.isEmpty() || correo.isEmpty()) {
+            mostrarAlerta("Por favor completa todos los campos obligatorios", Alert.AlertType.WARNING);
+            return;
+        }
+
+        try {
+            // TODO: Implementar actualización en el backend
+            // PUT /usuarios/{id}
+            
+            mostrarAlerta("✅ Perfil actualizado exitosamente", Alert.AlertType.INFORMATION);
+            
+            // Actualizar objeto usuario
+            usuarioActual.setNombre(nombre);
+            usuarioActual.setApellido(apellido);
+            usuarioActual.setCorreo(correo);
+            
+            cargarDatosUsuario();
+            mostrarInformacion();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error al actualizar perfil: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    @FXML
+    private void cancelarEdicion() {
+        cargarDatosUsuario();
+        mostrarInformacion();
+    }
+
+    @FXML
+    private void eliminarCuenta() {
+        // Primera confirmación
+        Alert confirmacion1 = new Alert(Alert.AlertType.WARNING);
+        confirmacion1.setTitle("⚠️ Eliminar Cuenta");
+        confirmacion1.setHeaderText("Esta acción es PERMANENTE e IRREVERSIBLE");
+        confirmacion1.setContentText(
+            "Si eliminas tu cuenta:\n\n" +
+            "❌ Perderás todos tus datos personales\n" +
+            "❌ Se eliminarán tus inscripciones a torneos\n" +
+            "❌ Perderás tu historial y estadísticas\n" +
+            "❌ Se borrarán tus equipos (si eres capitán)\n" +
+            "❌ Esta acción NO se puede deshacer\n\n" +
+            "¿Estás completamente seguro?"
+        );
+
+        ButtonType btnContinuar = new ButtonType("Sí, eliminar mi cuenta", ButtonBar.ButtonData.OK_DONE);
+        ButtonType btnCancelar = new ButtonType("No, conservar mi cuenta", ButtonBar.ButtonData.CANCEL_CLOSE);
+        confirmacion1.getButtonTypes().setAll(btnContinuar, btnCancelar);
+
+        confirmacion1.showAndWait().ifPresent(response -> {
+            if (response == btnContinuar) {
+                // Segunda confirmación con contraseña
+                TextInputDialog passwordDialog = new TextInputDialog();
+                passwordDialog.setTitle("Confirmar con Contraseña");
+                passwordDialog.setHeaderText("Ingresa tu contraseña para confirmar la eliminación");
+                passwordDialog.setContentText("Contraseña:");
+
+                passwordDialog.showAndWait().ifPresent(password -> {
+                    if (password.isEmpty()) {
+                        mostrarAlerta("Debes ingresar tu contraseña para confirmar", Alert.AlertType.WARNING);
+                        return;
+                    }
+
+                    eliminarCuentaDefinitivamente(password);
+                });
+            }
+        });
+    }
+
+    /**
+     * Ejecuta la eliminación definitiva de la cuenta
+     */
+    private void eliminarCuentaDefinitivamente(String password) {
+        try {
+            System.out.println("=== ELIMINANDO CUENTA ===");
+            System.out.println("ID Usuario: " + usuarioActual.getIdUsuario());
+            
+            String urlString = "http://localhost:8083/usuarios/" + usuarioActual.getIdUsuario();
+            
+            URL url = new URL(urlString);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("DELETE");
+
+            int responseCode = con.getResponseCode();
+            System.out.println("Response Code: " + responseCode);
+            
+            if (responseCode == 200 || responseCode == 204) {
+                // Eliminación exitosa
+                Alert exito = new Alert(Alert.AlertType.INFORMATION);
+                exito.setTitle("✅ Cuenta Eliminada");
+                exito.setHeaderText("Tu cuenta ha sido eliminada correctamente");
+                exito.setContentText(
+                    "Lamentamos verte partir.\n\n" +
+                    "Tu cuenta y todos tus datos han sido eliminados permanentemente del sistema.\n" +
+                    "Gracias por haber sido parte de Nexus Deportivo."
+                );
+                
+                exito.showAndWait();
+                
+                // Redirigir al login
+                irALogin();
+                
+            } else {
+                BufferedReader errorReader = new BufferedReader(
+                    new InputStreamReader(con.getErrorStream(), StandardCharsets.UTF_8)
+                );
+                StringBuilder errorMsg = new StringBuilder();
+                String errorLine;
+                while ((errorLine = errorReader.readLine()) != null) {
+                    errorMsg.append(errorLine);
+                }
+                errorReader.close();
+                
+                System.out.println("Error: " + errorMsg.toString());
+                mostrarAlerta("Error al eliminar la cuenta:\n" + errorMsg.toString(), Alert.AlertType.ERROR);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("No se pudo conectar con el servidor:\n" + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    // ==================== NAVEGACIÓN ====================
+
+    @FXML
+    private void irATorneos() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/vista.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) lblNombreCompleto.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            mostrarAlerta("Error al cargar torneos: " + e.getMessage(), Alert.AlertType.ERROR);
+        }
+    }
+
+    private void irALogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Login.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) lblNombreCompleto.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void cerrarSesion() {
+        Alert confirmacion = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmacion.setTitle("Cerrar Sesión");
+        confirmacion.setHeaderText("¿Estás seguro?");
+        confirmacion.setContentText("¿Deseas cerrar sesión y volver a la pantalla de inicio?");
+
+        confirmacion.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                irALogin();
+            }
+        });
+    }
+
+    // ==================== UTILIDADES ====================
+
+    private void mostrarAlerta(String mensaje, Alert.AlertType tipo) {
+        Alert alert = new Alert(tipo);
+        alert.setTitle(tipo == Alert.AlertType.ERROR ? "Error" : 
+                      tipo == Alert.AlertType.WARNING ? "Advertencia" : "Información");
+        alert.setHeaderText(null);
+        alert.setContentText(mensaje);
+        alert.showAndWait();
+    }
+}

@@ -1,0 +1,57 @@
+package com.adb.ms.service;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.adb.ms.model.Torneo;
+import com.adb.ms.repository.TorneoRepository;
+
+@Service
+public class TorneoService {
+
+    @Autowired
+    private TorneoRepository repo;
+
+    public List<Torneo> mostrar() {
+        return repo.findAll();
+    }
+
+    public Torneo guardar(Torneo t) {
+        return repo.save(t);
+    }
+
+    public void eliminar(int id) {
+        repo.deleteById(id);
+    }
+
+    public java.util.Optional<Torneo> buscarPorId(int id) {
+        return repo.findById(id);
+    }
+
+    public List<Torneo> buscarPorDeporte(int idDeporte) {
+        return repo.findByIdDeporte(idDeporte);
+    }
+
+    public List<Torneo> buscarTorneos(String nombre, Integer idDeporte, String fechaInicioStr) {
+        final LocalDate fechaInicio; // 👈 declaramos como final
+
+        if (fechaInicioStr != null && !fechaInicioStr.isEmpty()) {
+            fechaInicio = LocalDate.parse(fechaInicioStr);
+        } else {
+            fechaInicio = null;
+        }
+
+        List<Torneo> torneos = repo.findAll();
+
+        return torneos.stream()
+                .filter(t -> (nombre == null || t.getNombreYClasificacion().toLowerCase().contains(nombre.toLowerCase())))
+                .filter(t -> (idDeporte == null || t.getIdDeporte() == idDeporte))
+                .filter(t -> (fechaInicio == null || (t.getFechaInicio() != null && t.getFechaInicio().equals(fechaInicio))))
+                .collect(Collectors.toList());
+    }
+
+}

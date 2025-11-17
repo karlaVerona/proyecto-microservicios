@@ -1,0 +1,100 @@
+package com.adb.ms.controller;
+
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import com.adb.ms.model.Usuario;
+import com.adb.ms.service.UsuarioService;
+
+@RestController
+@RequestMapping("/usuarios")
+@CrossOrigin(origins = "*")
+public class UsuarioController {
+	
+    @Autowired
+    private UsuarioService service;
+	
+    @GetMapping
+    public List<Usuario> listar() {
+        return service.listar();
+    }
+	
+    @PostMapping("/crear")
+    public Usuario crear(@RequestBody Usuario u) {
+        return service.guardar(u);
+    }
+	
+    @GetMapping("/{id}")
+    public ResponseEntity<Usuario> buscarPorId(@PathVariable Integer id) {
+        return service.buscarPorId(id).map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+    }
+	
+    @GetMapping("/nombre/{nombre}")
+    public List<Usuario> buscarPorNombre(@PathVariable String nombre) {
+        return service.buscarPorNombre(nombre);
+    }
+	
+    /**
+     * ⭐ NUEVO: Endpoint de Login
+     * POST /usuarios/login
+     * Body: { "correo": "...", "contrasena": "..." }
+     */
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credenciales) {
+        String correo = credenciales.get("correo");
+        String contrasena = credenciales.get("contrasena");
+        
+        System.out.println("=== LOGIN ===");
+        System.out.println("Correo: " + correo);
+        System.out.println("Contraseña: " + contrasena);
+        
+        Usuario usuario = service.login(correo, contrasena);
+        
+        if (usuario == null) {
+            System.out.println("❌ Login fallido");
+            return ResponseEntity.status(401).body("Correo o contraseña incorrectos");
+        }
+        
+        System.out.println("✅ Login exitoso: " + usuario.getNombre());
+        
+        // Por seguridad, no enviar la contraseña al frontend
+        usuario.setContrasena(null);
+        
+        return ResponseEntity.ok(usuario);
+    }
+	
+    /**
+     * ⭐ NUEVO: Endpoint de Registro
+     * POST /usuarios/registro
+     * Body: { "nombre": "...", "apellido": "...", "correo": "...", "contrasena": "..." }
+     */
+    @PostMapping("/registro")
+    public ResponseEntity<?> registrar(@RequestBody Usuario usuario) {
+        System.out.println("=== REGISTRO ===");
+        System.out.println("Correo: " + usuario.getCorreo());
+        System.out.println("Nombre: " + usuario.getNombre());
+        
+        try {
+            Usuario nuevoUsuario = service.registrar(usuario);
+            
+            System.out.println("✅ Usuario registrado exitosamente");
+            
+            // Por seguridad, no enviar la contraseña al frontend
+            nuevoUsuario.setContrasena(null);
+            
+            return ResponseEntity.status(201).body(nuevoUsuario);
+            
+        } catch (RuntimeException e) {
+            System.out.println("❌ Error en registro: " + e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+}

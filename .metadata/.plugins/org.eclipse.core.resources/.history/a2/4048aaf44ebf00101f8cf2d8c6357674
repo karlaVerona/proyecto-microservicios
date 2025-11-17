@@ -1,0 +1,17 @@
+package com.adb.ms.repository;
+
+import java.util.Optional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import com.adb.ms.model.Usuario;
+
+@Repository
+public interface UsuarioRepository extends JpaRepository<Usuario, Integer> {
+    
+    // Buscar por correo (para verificar si existe al registrar)
+    Optional<Usuario> findByCorreo(String correo);
+    
+    // Buscar por correo y contraseña (para login)
+    Optional<Usuario> findByCorreoAndContrasena(String correo, String contrasena);
+    
+}

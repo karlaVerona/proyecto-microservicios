@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.adb.fx.controller.PerfilAdminController"
+            styleClass="perfil-main-container"
+            stylesheets="@styles.css">
+
+    <!-- ==================== TOP: NAVBAR ==================== -->
+    <top>
+        <VBox>
+            <!-- Navbar -->
+            <HBox styleClass="navbar-admin" alignment="CENTER_LEFT" spacing="20">
+                <padding>
+                    <Insets top="15" bottom="15" left="30" right="30"/>
+                </padding>
+
+                <Text text="🛡️" style="-fx-font-size: 28px;"/>
+                <VBox spacing="2">
+                    <Label text="Nexus Deportivo" styleClass="logo-text-admin"/>
+                    <Label text="Panel Administrativo" styleClass="logo-subtitle-admin"/>
+                </VBox>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <!-- Estadísticas mini -->
+                <HBox spacing="20" alignment="CENTER">
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label fx:id="lblTotalUsuarios" text="0" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                        <Label text="Usuarios" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 10px;"/>
+                    </VBox>
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label fx:id="lblTotalTorneos" text="0" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                        <Label text="Torneos" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 10px;"/>
+                    </VBox>
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label fx:id="lblPartidosHoy" text="0" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                        <Label text="Partidos" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 10px;"/>
+                    </VBox>
+                    <VBox alignment="CENTER" spacing="2">
+                        <Label fx:id="lblSolicitudesPendientes" text="0" style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;"/>
+                        <Label text="Solicitudes" style="-fx-text-fill: rgba(255,255,255,0.8); -fx-font-size: 10px;"/>
+                    </VBox>
+                </HBox>
+
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <VBox alignment="CENTER_RIGHT" spacing="1">
+                    <Label fx:id="lblNombreAdmin" text="Administrador" styleClass="admin-name-label"/>
+                    <Label text="Control Total" styleClass="admin-role-label"/>
+                </VBox>
+                <Text text="👤" style="-fx-font-size: 28px;"/>
+                
+                <Button text="🚪" styleClass="nav-btn-logout-admin" onAction="#cerrarSesion"/>
+            </HBox>
+
+            <!-- Tabs -->
+            <HBox spacing="0" alignment="CENTER_LEFT" style="-fx-background-color: #f5f5f5; -fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0;">
+                <padding>
+                    <Insets top="0" bottom="0" left="30" right="30"/>
+                </padding>
+                <Button fx:id="btnTabUsuarios" text="👥 Usuarios" styleClass="tab-btn-admin-active" onAction="#mostrarUsuarios"/>
+                <Button fx:id="btnTabTorneos" text="🏆 Torneos" styleClass="tab-btn-admin" onAction="#mostrarTorneos"/>
+                <Button fx:id="btnTabPartidos" text="⚽ Partidos" styleClass="tab-btn-admin" onAction="#mostrarPartidos"/>
+                <Button fx:id="btnTabSolicitudes" text="✉️ Solicitudes" styleClass="tab-btn-admin" onAction="#mostrarSolicitudes"/>
+                <Button fx:id="btnTabInscripciones" text="📝 Inscripciones" styleClass="tab-btn-admin" onAction="#mostrarInscripciones"/>
+                <Button fx:id="btnTabReglas" text="📜 Reglas" styleClass="tab-btn-admin" onAction="#mostrarReglas"/>
+                <Button fx:id="btnTabHistorial" text="📊 Historial" styleClass="tab-btn-admin" onAction="#mostrarHistorial"/>
+            </HBox>
+        </VBox>
+    </top>
+
+    <!-- ==================== CENTER: CONTENIDO ==================== -->
+    <center>
+        <StackPane>
+            
+            <!-- ========== SECCIÓN USUARIOS ========== -->
+            <VBox fx:id="seccionUsuarios" spacing="15" visible="true" style="-fx-background-color: white;">
+                <padding>
+                    <Insets top="20" bottom="20" left="30" right="30"/>
+                </padding>
+
+                <Label text="👥 Gestión de Usuarios" styleClass="subsection-title-admin"/>
+                
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <TextField fx:id="txtBuscarUsuario" promptText="🔍 Buscar..." styleClass="search-input-admin" prefWidth="350"/>
+                    <Button text="Buscar" styleClass="btn-admin-primary" onAction="#buscarUsuarios"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="➕ Crear Usuario Admin" styleClass="btn-admin-success" onAction="#crearUsuarioAdmin"/>
+                </HBox>
+
+                <TableView fx:id="tablaUsuarios" styleClass="table-admin" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colUsuarioId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colUsuarioNombre" text="Nombre" prefWidth="200"/>
+                        <TableColumn fx:id="colUsuarioCorreo" text="Correo" prefWidth="220"/>
+                        <TableColumn fx:id="colUsuarioRFC" text="RFC" prefWidth="140"/>
+                        <TableColumn fx:id="colUsuarioRol" text="Rol" prefWidth="120"/>
+                        <TableColumn fx:id="colUsuarioDeporte" text="Deporte" prefWidth="120"/>
+                        <TableColumn fx:id="colUsuarioFecha" text="Registro" prefWidth="130"/>
+                        <TableColumn fx:id="colUsuarioAcciones" text="Acciones" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- ========== SECCIÓN TORNEOS ========== -->
+            <VBox fx:id="seccionTorneos" spacing="15" visible="false" style="-fx-background-color: white;">
+                <padding>
+                    <Insets top="20" bottom="20" left="30" right="30"/>
+                </padding>
+
+                <Label text="🏆 Gestión de Torneos" styleClass="subsection-title-admin"/>
+                
+                <HBox spacing="12">
+                    <Button text="➕ Crear Torneo" styleClass="btn-admin-success" onAction="#abrirCrearTorneo"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <ComboBox fx:id="cmbFiltroDeporteTorneo" promptText="Deporte" styleClass="combo-admin"/>
+                </HBox>
+
+                <TableView fx:id="tablaTorneos" styleClass="table-admin" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colTorneoId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colTorneoNombre" text="Nombre" prefWidth="250"/>
+                        <TableColumn fx:id="colTorneoDeporte" text="Deporte" prefWidth="120"/>
+                        <TableColumn fx:id="colTorneoFechaInicio" text="Inicio" prefWidth="120"/>
+                        <TableColumn fx:id="colTorneoFechaFin" text="Fin" prefWidth="120"/>
+                        <TableColumn fx:id="colTorneoParticipantes" text="Participantes" prefWidth="120"/>
+                        <TableColumn fx:id="colTorneoEstado" text="Estado" prefWidth="100"/>
+                        <TableColumn fx:id="colTorneoAcciones" text="Acciones" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- ========== SECCIÓN PARTIDOS ========== -->
+            <VBox fx:id="seccionPartidos" spacing="15" visible="false" style="-fx-background-color: white;">
+                <padding>
+                    <Insets top="20" bottom="20" left="30" right="30"/>
+                </padding>
+
+                <Label text="⚽ Gestión de Partidos" styleClass="subsection-title-admin"/>
+                
+                <HBox spacing="12">
+                    <Button text="➕ Programar Partido" styleClass="btn-admin-success" onAction="#abrirCrearPartido"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <DatePicker fx:id="dpFiltroFecha" promptText="Fecha" styleClass="datepicker-admin"/>
+                </HBox>
+
+                <TableView fx:id="tablaPartidos" styleClass="table-admin" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colPartidoId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colPartidoTorneo" text="Torneo" prefWidth="180"/>
+                        <TableColumn fx:id="colPartidoEquipo1" text="Local" prefWidth="180"/>
+                        <TableColumn fx:id="colPartidoEquipo2" text="Visitante" prefWidth="180"/>
+                        <TableColumn fx:id="colPartidoFecha" text="Fecha/Hora" prefWidth="150"/>
+                        <TableColumn fx:id="colPartidoLugar" text="Lugar" prefWidth="150"/>
+                        <TableColumn fx:id="colPartidoEstado" text="Estado" prefWidth="100"/>
+                        <TableColumn fx:id="colPartidoAcciones" text="Acciones" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- ========== SECCIÓN SOLICITUDES ========== -->
+            <VBox fx:id="seccionSolicitudes" spacing="15" visible="false" style="-fx-background-color: white;">
+                <padding>
+                    <Insets top="20" bottom="20" left="30" right="30"/>
+                </padding>
+
+                <Label text="✉️ Solicitudes de Rol" styleClass="subsection-title-admin"/>
+                
+                <HBox spacing="12">
+                    <ComboBox fx:id="cmbFiltroTipoSolicitud" promptText="Tipo" styleClass="combo-admin"/>
+                    <ComboBox fx:id="cmbFiltroEstadoSolicitud" promptText="Estado" styleClass="combo-admin"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblContadorSolicitudes" text="0 pendientes" styleClass="contador-label-admin"/>
+                </HBox>
+
+                <TableView fx:id="tablaSolicitudes" styleClass="table-admin" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colSolicitudId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colSolicitudUsuario" text="Usuario" prefWidth="180"/>
+                        <TableColumn fx:id="colSolicitudTipo" text="Tipo" prefWidth="120"/>
+                        <TableColumn fx:id="colSolicitudRazon" text="Razón" prefWidth="300"/>
+                        <TableColumn fx:id="colSolicitudFecha" text="Fecha" prefWidth="130"/>
+                        <TableColumn fx:id="colSolicitudEstado" text="Estado" prefWidth="100"/>
+                        <TableColumn fx:id="colSolicitudAcciones" text="Acciones" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- ========== SECCIÓN INSCRIPCIONES ========== -->
+            <VBox fx:id="seccionInscripciones" spacing="15" visible="false" style="-fx-background-color: white;">
+                <padding>
+                    <Insets top="20" bottom="20" left="30" right="30"/>
+                </padding>
+
+                <Label text="📝 Validación de Inscripciones" styleClass="subsection-title-admin"/>
+                
+                <HBox spacing="12">
+                    <ComboBox fx:id="cmbFiltroTorneoInscripcion" promptText="Torneo" styleClass="combo-admin" prefWidth="300"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Label fx:id="lblContadorInscripciones" text="0 pendientes" styleClass="contador-label-admin"/>
+                </HBox>
+
+                <TableView fx:id="tablaInscripciones" styleClass="table-admin" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colInscripcionId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colInscripcionUsuario" text="Usuario" prefWidth="180"/>
+                        <TableColumn fx:id="colInscripcionTorneo" text="Torneo" prefWidth="200"/>
+                        <TableColumn fx:id="colInscripcionRFC" text="RFC" prefWidth="130"/>
+                        <TableColumn fx:id="colInscripcionRFCValido" text="RFC Válido" prefWidth="100"/>
+                        <TableColumn fx:id="colInscripcionAntecedentes" text="Antecedentes" prefWidth="120"/>
+                        <TableColumn fx:id="colInscripcionFecha" text="Fecha" prefWidth="130"/>
+                        <TableColumn fx:id="colInscripcionEstado" text="Estado" prefWidth="100"/>
+                        <TableColumn fx:id="colInscripcionAcciones" text="Acciones" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- ========== SECCIÓN REGLAS ========== -->
+            <VBox fx:id="seccionReglas" spacing="15" visible="false" style="-fx-background-color: white;">
+                <padding>
+                    <Insets top="20" bottom="20" left="30" right="30"/>
+                </padding>
+
+                <Label text="📜 Reglas Deportivas" styleClass="subsection-title-admin"/>
+                
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="Deporte:" styleClass="form-label-admin"/>
+                    <ComboBox fx:id="cmbDeporteReglas" promptText="Seleccionar" styleClass="combo-admin" prefWidth="200" onAction="#cargarReglasDeporte"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="➕ Agregar Regla" styleClass="btn-admin-success" onAction="#agregarRegla"/>
+                </HBox>
+
+                <TableView fx:id="tablaReglas" styleClass="table-admin" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colReglaId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colReglaDeporte" text="Deporte" prefWidth="120"/>
+                        <TableColumn fx:id="colReglaTitulo" text="Título" prefWidth="200"/>
+                        <TableColumn fx:id="colReglaDescripcion" text="Descripción" prefWidth="400"/>
+                        <TableColumn fx:id="colReglaFecha" text="Modificación" prefWidth="150"/>
+                        <TableColumn fx:id="colReglaAcciones" text="Acciones" prefWidth="200"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+            <!-- ========== SECCIÓN HISTORIAL ========== -->
+            <VBox fx:id="seccionHistorial" spacing="15" visible="false" style="-fx-background-color: white;">
+                <padding>
+                    <Insets top="20" bottom="20" left="30" right="30"/>
+                </padding>
+
+                <Label text="📊 Historial del Sistema" styleClass="subsection-title-admin"/>
+                
+                <HBox spacing="12">
+                    <ComboBox fx:id="cmbFiltroTipoHistorial" promptText="Tipo" styleClass="combo-admin"/>
+                    <DatePicker fx:id="dpFechaInicioHistorial" promptText="Inicio" styleClass="datepicker-admin"/>
+                    <DatePicker fx:id="dpFechaFinHistorial" promptText="Fin" styleClass="datepicker-admin"/>
+                    <Button text="Buscar" styleClass="btn-admin-primary" onAction="#buscarHistorial"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="📥 Exportar" styleClass="btn-admin-secondary" onAction="#exportarHistorial"/>
+                </HBox>
+
+                <TableView fx:id="tablaHistorial" styleClass="table-admin" VBox.vgrow="ALWAYS">
+                    <columns>
+                        <TableColumn fx:id="colHistorialId" text="ID" prefWidth="60"/>
+                        <TableColumn fx:id="colHistorialFecha" text="Fecha/Hora" prefWidth="150"/>
+                        <TableColumn fx:id="colHistorialTipo" text="Tipo" prefWidth="120"/>
+                        <TableColumn fx:id="colHistorialDescripcion" text="Descripción" prefWidth="400"/>
+                        <TableColumn fx:id="colHistorialUsuario" text="Usuario" prefWidth="180"/>
+                        <TableColumn fx:id="colHistorialEstado" text="Estado" prefWidth="120"/>
+                    </columns>
+                </TableView>
+            </VBox>
+
+        </StackPane>
+    </center>
+
+</BorderPane>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Text?>
+
+<BorderPane xmlns="http://javafx.com/javafx/17" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.adb.fx.controller.LoginAdminController"
+            styleClass="login-main-container"
+            stylesheets="@styles.css">
+
+    <!-- PANEL IZQUIERDO - DISEÑO ADMIN -->
+    <left>
+        <VBox styleClass="login-left-panel-admin" prefWidth="500" alignment="CENTER" spacing="40">
+            <padding>
+                <Insets top="60" bottom="60" left="40" right="40"/>
+            </padding>
+
+            <!-- Logo Admin -->
+            <VBox alignment="CENTER" spacing="15">
+                <Text text="🔒" styleClass="login-emoji-icon-admin"/>
+                <Text text="ACCESO" styleClass="login-welcome-text-admin"/>
+                <Text text="ADMINISTRATIVO" styleClass="login-brand-text-admin"/>
+                <Text text="Panel de Control y Gestión del Sistema" 
+                      styleClass="login-description-text-admin"
+                      textAlignment="CENTER" wrappingWidth="380"/>
+            </VBox>
+
+            <!-- Características del Panel Admin -->
+            <VBox spacing="20" alignment="CENTER_LEFT" maxWidth="400">
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Text text="✓" styleClass="login-feature-check-admin"/>
+                    <Text text="Gestión completa de torneos y partidos" 
+                          styleClass="login-feature-text-admin" wrappingWidth="300"/>
+                </HBox>
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Text text="✓" styleClass="login-feature-check-admin"/>
+                    <Text text="Control de usuarios y solicitudes" 
+                          styleClass="login-feature-text-admin" wrappingWidth="300"/>
+                </HBox>
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Text text="✓" styleClass="login-feature-check-admin"/>
+                    <Text text="Validación de RFC y antecedentes" 
+                          styleClass="login-feature-text-admin" wrappingWidth="300"/>
+                </HBox>
+                <HBox spacing="15" alignment="CENTER_LEFT">
+                    <Text text="✓" styleClass="login-feature-check-admin"/>
+                    <Text text="Configuración de reglas deportivas" 
+                          styleClass="login-feature-text-admin" wrappingWidth="300"/>
+                </HBox>
+            </VBox>
+
+            <!-- Botón volver -->
+            <Button text="← Volver al inicio de sesión regular" 
+                    styleClass="btn-back-regular"
+                    onAction="#volverALogin"
+                    maxWidth="Infinity"/>
+        </VBox>
+    </left>
+
+    <!-- PANEL DERECHO - FORMULARIO -->
+    <center>
+        <VBox styleClass="login-right-panel" alignment="CENTER" spacing="30">
+            <padding>
+                <Insets top="80" bottom="80" left="60" right="60"/>
+            </padding>
+
+            <!-- Título -->
+            <VBox spacing="8" alignment="CENTER">
+                <Label text="Iniciar Sesión como Admin" styleClass="login-form-title-admin"/>
+                <Label text="Accede al panel de control administrativo" 
+                       styleClass="login-form-subtitle"/>
+            </VBox>
+
+            <!-- Formulario -->
+            <VBox spacing="25" styleClass="login-input-group" maxWidth="400">
+                
+                <!-- Usuario Admin -->
+                <VBox spacing="8">
+                    <Label text="Usuario Administrativo" styleClass="login-input-label"/>
+                    <TextField fx:id="txtUsuarioAdmin" 
+                              promptText="Ingresa tu usuario de administrador"
+                              styleClass="login-input-field"/>
+                </VBox>
+
+                <!-- Contraseña -->
+                <VBox spacing="8">
+                    <Label text="Contraseña" styleClass="login-input-label"/>
+                    <PasswordField fx:id="txtPasswordAdmin" 
+                                  promptText="Ingresa tu contraseña"
+                                  styleClass="login-input-field"/>
+                </VBox>
+
+                <!-- Recordar sesión -->
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <CheckBox fx:id="chkRecordarAdmin" 
+                             text="Recordar sesión administrativa"
+                             styleClass="login-checkbox"/>
+                </HBox>
+
+                <!-- Botón Login Admin -->
+                <Button text="Acceder al Panel Administrativo" 
+                       styleClass="login-submit-button-admin"
+                       onAction="#iniciarSesionAdmin"
+                       maxWidth="Infinity"/>
+
+                <!-- Advertencia de seguridad -->
+                <HBox styleClass="admin-warning-box" spacing="10" alignment="CENTER">
+                    <padding>
+                        <Insets top="12" bottom="12" left="15" right="15"/>
+                    </padding>
+                    <Text text="⚠️" style="-fx-font-size: 16px;"/>
+                    <Text text="Este acceso está reservado exclusivamente para administradores autorizados. Todos los accesos son registrados."
+                          styleClass="admin-warning-text"
+                          wrappingWidth="320"
+                          textAlignment="CENTER"/>
+                </HBox>
+            </VBox>
+
+            <!-- Footer -->
+            <VBox spacing="8" alignment="CENTER">
+                <Label text="¿Olvidaste tu contraseña administrativa?" 
+                       styleClass="login-terms-text"/>
+                <Label text="Contacta al administrador principal del sistema" 
+                       styleClass="login-link-small"
+                       style="-fx-text-fill: #8B1538;"/>
+            </VBox>
+        </VBox>
+    </center>
+
+</BorderPane>

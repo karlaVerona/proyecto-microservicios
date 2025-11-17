@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.*?>
+
+<VBox alignment="CENTER" spacing="15" xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.adb.fx.controller.LoginController"
+      style="-fx-background-color: #f8f9fa; -fx-padding: 40;">
+    
+    <Label text="Inicio de Sesión" style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+    
+    <TextField fx:id="correoField" promptText="Correo electrónico" prefWidth="250"/>
+    <PasswordField fx:id="contrasenaField" promptText="Contraseña" prefWidth="250"/>
+    
+    <Button text="Iniciar Sesión" onAction="#iniciarSesion" prefWidth="250" style="-fx-background-color: #0078D7; -fx-text-fill: white;"/>
+    <Button text="Registrarse" onAction="#irARegistro" prefWidth="250" style="-fx-background-color: #6c757d; -fx-text-fill: white;"/>
+    
+    <Label fx:id="mensajeLabel" textFill="red"/>
+</VBox>

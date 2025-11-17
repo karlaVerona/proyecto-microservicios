@@ -1,0 +1,79 @@
+/* --- NAVBAR --- */
+.navbar {
+    background: linear-gradient(to right, #ff6600, #ff9900); /* estándar */
+    -fx-background-color: linear-gradient(to right, #ff6600, #ff9900); /* JavaFX */
+    -fx-padding: 10;
+}
+
+.logo {
+    -fx-text-fill: white;
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+/* --- BOTONES DEL MENÚ --- */
+.nav-button {
+    background: transparent;
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    background: rgba(255,255,255,0.2);
+    -fx-background-color: rgba(255,255,255,0.2);
+}
+
+/* --- BOTÓN LOGIN --- */
+.login-button {
+    background: white;
+    -fx-background-color: white;
+    -fx-text-fill: #ff6600;
+    -fx-font-weight: bold;
+    -fx-padding: 6 15;
+    -fx-background-radius: 20;
+    -fx-cursor: hand;
+}
+
+.login-button:hover {
+    background: #ffe6cc;
+    -fx-background-color: #ffe6cc;
+}
+
+/* --- BANNER --- */
+.banner {
+    background: url("/images/banner.jpg");
+    -fx-background-image: url("/images/banner.jpg");
+    -fx-background-size: cover;
+    -fx-background-position: center center;
+}
+
+.banner-text {
+    -fx-font-size: 28px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
+    -fx-effect: dropshadow(gaussian, black, 4, 0.5, 2, 2);
+}
+
+/* --- SECCIONES --- */
+.section-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ff6600;
+}
+
+.buscar-button {
+    background: #ff6600;
+    -fx-background-color: #ff6600;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 6 20;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+}
+
+.buscar-button:hover {
+    background: #ff8533;
+    -fx-background-color: #ff8533;
+}

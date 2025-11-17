@@ -1,0 +1,21 @@
+package com.adb.ms.repository;
+
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import com.adb.ms.model.Torneo;
+
+public interface TorneoRepository extends JpaRepository<Torneo, Integer>{
+	@Query(value = "SELECT * FROM Torneo WHERE idTorneo = :id", nativeQuery = true)
+    Torneo buscarPorId(@Param("id") int id);
+
+    @Query(value = "SELECT * FROM Torneo WHERE idDeporte = :idDeporte", nativeQuery = true)
+    List<Torneo> buscarPorDeporte(@Param("idDeporte") int idDeporte);
+    
+    List<Torneo> findByNombreYClasificacionContainingIgnoreCase(String nombreYClasificacion);
+    List<Torneo> findByIdDeporte(int Deporte);
+    
+}

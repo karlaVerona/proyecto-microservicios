@@ -1,0 +1,101 @@
+package com.adb.fx.controller;
+
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.*;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+
+import com.adb.fx.model.Evento;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+public class VistaController {
+
+    @FXML private TextField txtBuscarNombre;
+    @FXML private ComboBox<String> cmbDeporte;
+    @FXML private DatePicker dpFecha;
+    @FXML private TableView<Evento> tablaEventos;
+    @FXML private TableColumn<Evento, String> colNombre;
+    @FXML private TableColumn<Evento, String> colDeporte;
+    @FXML private TableColumn<Evento, String> colFecha;
+    @FXML private TableColumn<Evento, String> colUbicacion;
+
+    private ObservableList<Evento> listaEventos = FXCollections.observableArrayList();
+
+    @FXML
+    public void initialize() {
+        // Inicializa las columnas
+        colNombre.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getNombre()));
+        colDeporte.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getDeporte()));
+        colFecha.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getFecha()));
+        colUbicacion.setCellValueFactory(c -> new javafx.beans.property.SimpleStringProperty(c.getValue().getUbicacion()));
+
+        tablaEventos.setItems(listaEventos);
+
+        // Inicializa el combo
+        cmbDeporte.setItems(FXCollections.observableArrayList(
+                "Ciclismo", "Atletismo", "Natación", "Triatlón", "Otro"
+        ));
+
+        // Cargar todos los eventos al inicio
+        cargarEventos(null, null, null);
+    }
+
+    @FXML
+    private void buscarEventos() {
+        String nombre = txtBuscarNombre.getText().trim();
+        String deporte = cmbDeporte.getValue();
+        String fecha = dpFecha.getValue() != null ? dpFecha.getValue().toString() : null;
+
+        cargarEventos(nombre, deporte, fecha);
+    }
+
+    private void cargarEventos(String nombre, String deporte, String fecha) {
+        try {
+            // URL de tu microservicio (ajústala según tu backend)
+            String urlStr = "http://localhost:8080/eventos";
+
+            List<String> params = new ArrayList<>();
+            if (nombre != null && !nombre.isEmpty()) params.add("nombre=" + nombre);
+            if (deporte != null && !deporte.isEmpty()) params.add("deporte=" + deporte);
+            if (fecha != null && !fecha.isEmpty()) params.add("fecha=" + fecha);
+
+            if (!params.isEmpty()) urlStr += "?" + String.join("&", params);
+
+            URL url = new URL(urlStr);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+
+            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
+            StringBuilder response = new StringBuilder();
+            String line;
+            while ((line = in.readLine()) != null) response.append(line);
+            in.close();
+
+            JSONArray arr = new JSONArray(response.toString());
+            listaEventos.clear();
+
+            for (int i = 0; i < arr.length(); i++) {
+                JSONObject obj = arr.getJSONObject(i);
+                listaEventos.add(new Evento(
+                        obj.optString("nombre"),
+                        obj.optString("deporte"),
+                        obj.optString("fecha"),
+                        obj.optString("ubicacion")
+                ));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Mensaje de error amigable
+            Alert alert = new Alert(Alert.AlertType.ERROR, "Error al cargar los eventos: " + e.getMessage());
+            alert.showAndWait();
+        }
+    }
+}

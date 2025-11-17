@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.image.Image?>
+
+<BorderPane fx:controller="com.adb.fx.controller.VistaController"
+            xmlns:fx="http://javafx.com/fxml" prefWidth="900" prefHeight="600"
+            stylesheets="@styles.css">
+
+    <!-- Barra superior -->
+    <top>
+        <VBox spacing="0">
+            <HBox styleClass="navbar" alignment="CENTER_LEFT" spacing="20">
+                <padding>
+                    <Insets top="10" right="10" bottom="10" left="10"/>
+                </padding>
+
+                <ImageView fitHeight="35" fitWidth="35">
+                    <image>
+                        <Image url="@../images/icon-logo.png"/>
+                    </image>
+                </ImageView>
+                <Label text="Nexus deportivo" styleClass="logo"/>
+
+                <HBox spacing="15">
+                    <Button text="Eventos" styleClass="nav-button"/>
+                    <Button text="Resultados" styleClass="nav-button"/>
+                    <Button text="Torneos" styleClass="nav-button"/>
+                    <Button text="Equipos" styleClass="nav-button"/>
+                </HBox>
+                <Region HBox.hgrow="ALWAYS"/>
+
+                <Button styleClass="login-button">
+                    <graphic>
+                        <ImageView fitHeight="20" fitWidth="20">
+                            <image>
+                                <Image url="@../images/icon-user.png"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    <text>Iniciar sesión</text>
+                </Button>
+            </HBox>
+
+            <!-- Banner -->
+            <StackPane styleClass="banner" prefHeight="180">
+                <ImageView fitWidth="900" fitHeight="180" preserveRatio="false">
+                    <image>
+                        <Image url="@../images/banner.jpg"/>
+                    </image>
+                </ImageView>
+                <Label text="Encuentra tu próximo evento" styleClass="banner-text"/>
+            </StackPane>
+        </VBox>
+    </top>
+
+    <!-- Centro: Buscador -->
+   <center>
+    <VBox spacing="15" alignment="TOP_CENTER" styleClass="content-container">
+        <HBox spacing="10" alignment="CENTER">
+            <TextField fx:id="txtBuscarNombre" promptText="Buscar por nombre..." prefWidth="200"/>
+            <ComboBox fx:id="cmbDeporte" promptText="Tipo de deporte" prefWidth="180"/>
+            <DatePicker fx:id="dpFecha" promptText="Fecha" prefWidth="150"/>
+            <Button text="Buscar" onAction="#buscarEventos" styleClass="btn-buscar"/>
+        </HBox>
+
+        <TableView fx:id="tablaEventos" prefHeight="400" prefWidth="700">
+            <columns>
+                <TableColumn fx:id="colNombre" text="Nombre" prefWidth="200"/>
+                <TableColumn fx:id="colDeporte" text="Deporte" prefWidth="150"/>
+                <TableColumn fx:id="colFecha" text="Fecha" prefWidth="150"/>
+                <TableColumn fx:id="colUbicacion" text="Ubicación" prefWidth="200"/>
+            </columns>
+        </TableView>
+    </VBox>
+</center>
+
+</BorderPane>

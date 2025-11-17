@@ -1,0 +1,20 @@
+package com.adb.fx.model;
+
+public class Evento {
+    private String nombre;
+    private String deporte;
+    private String fecha;
+    private String ubicacion;
+
+    public Evento(String nombre, String deporte, String fecha, String ubicacion) {
+        this.nombre = nombre;
+        this.deporte = deporte;
+        this.fecha = fecha;
+        this.ubicacion = ubicacion;
+    }
+
+    public String getNombre() { return nombre; }
+    public String getDeporte() { return deporte; }
+    public String getFecha() { return fecha; }
+    public String getUbicacion() { return ubicacion; }
+}
